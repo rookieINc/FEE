@@ -14,6 +14,8 @@
 #ifndef _FLOW_PARSE_H_INCLUDED_
 #define _FLOW_PARSE_H_INCLUDED_
 
+#include "kdk.h"
+
 #define PROCESS_NOR_STATUS      0
 #define PROCESS_PRE_STATUS      1
 #define PROCESS_ERR_STATUS      2
@@ -64,5 +66,31 @@ struct flow_branch_runtime_s
 
 typedef struct flow_branch_runtime_s flow_branch_runtime_t;
 
+
+
+static kdk_uint32 
+get_process_status_from_flow_stream(kdk_char32 *flow_stream, kdk_char32 *flow_branch_id, 
+                                    kdk_uint32 flow_branch_id_len, kdk_uint32 *process_status, kdk_uint32 *offset);
+
+static flow_node_t *
+flow_node_create(flow_branch_collection_t *collection, kdk_char32 *flow_node_id);
+
+static flow_branch_t *
+flow_branch_create(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id);
+
+kdk_void 
+flow_branch_collection_destroy(flow_branch_collection_t *collection);
+
+flow_branch_collection_t *
+flow_branch_collection_create(kdk_mem_pool_t *mem_pool, kdk_uint32 mem_pool_size, kdk_uint32 prime);
+
+kdk_uint32 
+flow_branch_init(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id, kdk_char32 *flow_stream);
+
+flow_branch_t *
+flow_branch_get(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id);
+
+kdk_void 
+flow_branch_print(flow_branch_t *main_branch);
 
 #endif /* _FLOW_PARSE_H_INCLUDED_ */
