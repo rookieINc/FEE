@@ -24,6 +24,9 @@
 #define NODE_ID_LEN             3
 #define BRANCH_ID_LEN           6
 
+#define PROCESS_SUCCESS         0
+#define PROCESS_FAILURE         1
+
 struct flow_node_s
 {
     kdk_char32             id[NODE_ID_LEN + 1];
@@ -57,11 +60,14 @@ typedef struct flow_branch_collection_s flow_branch_collection_t;
 
 struct flow_branch_runtime_s
 {
+    kdk_char32              id[BRANCH_ID_LEN + 1];
     kdk_uint32              node_step;
     kdk_uint32              branch_step;
+    kdk_uint32              mem_pool_type;
+    struct kdk_mem_pool_s  *mem_pool;
     struct flow_node_s     *node_current;
     struct flow_branch_s   *branch_current;
-    struct flow_branch_s   *main_branch;
+    struct flow_branch_s   *branch_main;
 };
 
 typedef struct flow_branch_runtime_s flow_branch_runtime_t;
@@ -78,17 +84,29 @@ flow_node_create(flow_branch_collection_t *collection, kdk_char32 *flow_node_id)
 static flow_branch_t *
 flow_branch_create(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id);
 
-kdk_void 
-flow_branch_collection_destroy(flow_branch_collection_t *collection);
-
 flow_branch_collection_t *
 flow_branch_collection_create(kdk_mem_pool_t *mem_pool, kdk_uint32 mem_pool_size, kdk_uint32 prime);
 
-kdk_uint32 
-flow_branch_init(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id, kdk_char32 *flow_stream);
+kdk_void 
+flow_branch_collection_destroy(flow_branch_collection_t *collection);
 
-flow_branch_t *
+kdk_uint32 
+flow_branch_set(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id, kdk_char32 *flow_stream);
+
+static flow_branch_t *
 flow_branch_get(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id);
+
+flow_branch_runtime_t *
+flow_branch_runtime_create(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id);
+
+kdk_uint32
+flow_branch_runtime_init(flow_branch_collection_t *collection, flow_branch_runtime_t *runtime);
+
+kdk_void
+flow_branch_runtime_clear(flow_branch_runtime_t *runtime);
+
+kdk_void 
+flow_branch_runtime_destroy(flow_branch_runtime_t *runtime);
 
 kdk_void 
 flow_branch_print(flow_branch_t *main_branch);

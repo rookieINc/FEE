@@ -20,5 +20,5 @@ lib_install:
 libfee.so:$(C_FILE)
 	gcc -o libfee.so -fpic -shared $(C_FILE) $(INC_PATH)
 
-test:test.c
+test:test.c $(C_FILE)
 	gcc -o test test.c $(INC_PATH) $(LIB_PATH) -lfee -lkdk

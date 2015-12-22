@@ -57,11 +57,12 @@ typedef struct flow_branch_collection_s flow_branch_collection_t;
 
 struct flow_branch_runtime_s
 {
+    kdk_char32              id[BRANCH_ID_LEN + 1];
     kdk_uint32              node_step;
     kdk_uint32              branch_step;
     struct flow_node_s     *node_current;
     struct flow_branch_s   *branch_current;
-    struct flow_branch_s   *main_branch;
+    struct flow_branch_s   *branch_main;
 };
 
 typedef struct flow_branch_runtime_s flow_branch_runtime_t;
@@ -85,7 +86,7 @@ flow_branch_collection_t *
 flow_branch_collection_create(kdk_mem_pool_t *mem_pool, kdk_uint32 mem_pool_size, kdk_uint32 prime);
 
 kdk_uint32 
-flow_branch_init(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id, kdk_char32 *flow_stream);
+flow_branch_set(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id, kdk_char32 *flow_stream);
 
 flow_branch_t *
 flow_branch_get(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id);
