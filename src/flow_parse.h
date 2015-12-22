@@ -27,6 +27,9 @@
 #define PROCESS_SUCCESS         0
 #define PROCESS_FAILURE         1
 
+#define FLOW_MAIN               0
+#define FLOW_ERR                1
+
 struct flow_node_s
 {
     kdk_char32             id[NODE_ID_LEN + 1];
@@ -63,6 +66,7 @@ struct flow_branch_runtime_s
     kdk_char32              id[BRANCH_ID_LEN + 1];
     kdk_uint32              node_step;
     kdk_uint32              branch_step;
+    kdk_uint32              is_main; // FLOW_MAIN FLOW_ERR
     kdk_uint32              mem_pool_type;
     struct kdk_mem_pool_s  *mem_pool;
     struct flow_node_s     *node_current;

@@ -360,6 +360,7 @@ flow_branch_runtime_create(kdk_mem_pool_t *mem_pool, kdk_uint32 mem_pool_size,  
 
     memset(runtime->id, 0, BRANCH_ID_LEN + 1);
     strncpy(runtime->id, flow_branch_id, BRANCH_ID_LEN);
+    runtime->is_main        = FLOW_MAIN;
     runtime->node_step      = 0;
     runtime->branch_step    = 0;
     runtime->mem_pool_type  = mem_pool_type;
@@ -398,6 +399,7 @@ flow_branch_runtime_clear(flow_branch_runtime_t *runtime)
         return ;
     
     memset(runtime->id, 0, BRANCH_ID_LEN + 1);
+    runtime->is_main        = FLOW_MAIN;
     runtime->node_step      = 0;
     runtime->branch_step    = 0;
     runtime->mem_pool_type  = mem_pool_type;
@@ -416,7 +418,7 @@ flow_branch_runtime_clear(flow_branch_runtime_t *runtime)
  * If isSuccess is FAILURE, err_id shouldn't be KDK_NULL;
  * RETURN VALUE: KDK_SUCCESS  - exec success
  *             : KDK_NOTFOUND - exec success && not any NODE to exec
- *             : KDK_FAILURE  - exec failure && not any BRANCH to exec
+ *             : KDK_FAILURE  - exec failure && not any BRANCH / NODE to exec
  */
 kdk_uint32
 flow_branch_runtime_next(flow_branch_runtime_t *runtime, kdk_uint32 isSuccess, kdk_char32 *err_id, kdk_char32 *node_id)
@@ -428,13 +430,16 @@ flow_branch_runtime_next(flow_branch_runtime_t *runtime, kdk_uint32 isSuccess, k
     {
         case PROCESS_SUCCESS:
                 if(runtime->node_current == KDK_NULL)
-                    return KDK_INVAL;
+                    return KDK_FAILURE;
+
                 strncpy(node_id, runtime->node_current->id, NODE_ID_LEN);
                 if((runtime->node_current = runtime->node_current->next) == KDK_NULL)
                     return KDK_NOTFOUND;
                 break;
 
         case PROCESS_FAILURE:
+                runtime->is_main = FLOW_ERR;
+
                 if(err_id == KDK_NULL)
                     return KDK_INARG;
 
@@ -444,6 +449,7 @@ flow_branch_runtime_next(flow_branch_runtime_t *runtime, kdk_uint32 isSuccess, k
                     if(strcmp(runtime->branch_current->id, err_id) == 0)
                     {
                         runtime->node_current = runtime->branch_current->node_list;
+                        return flow_branch_runtime_next(runtime, isSuccess, KDK_NULL, node_id);
                     }
                     runtime->branch_current = runtime->branch_current->branch_next;    
                 }
@@ -455,7 +461,8 @@ flow_branch_runtime_next(flow_branch_runtime_t *runtime, kdk_uint32 isSuccess, k
             return KDK_INARG;
     }
 
-    (runtime->node_step)++;
+    if(runtime->is_main == FLOW_MAIN)
+        (runtime->node_step)++;
 
     return KDK_SUCCESS;
 }
