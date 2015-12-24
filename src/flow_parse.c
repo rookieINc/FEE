@@ -13,35 +13,6 @@
 
 #include "flow_parse.h"
 
-/*
-flow_data_t *
-flow_data_init(kdk_void (*fill_data)(flow_data_t *))
-{
-    flow_data_t *data;
-
-    data = (flow_data_t *)kdk_malloc(sizeof(flow_data_t));
-    if(data == KDK_NULL)
-        return KDK_NULL;
-    
-    fill_data(data);
-
-    return data;
-}
-
-kdk_void 
-flow_branch_runtime_clear(flow_branch_t *branch)
-{
-    if(branch == KDK_NULL) 
-        return ;
-
-    branch->node_current   = branch->node_list;
-    branch->branch_current = branch;
-    branch->step = 0;
-
-    return ;
-}
-*/
-
 static kdk_uint32 
 get_process_status_from_flow_stream(kdk_char32 *flow_stream, kdk_char32 *flow_branch_id, kdk_uint32 flow_branch_id_len, kdk_uint32 *process_status, kdk_uint32 *offset)
 {
@@ -159,20 +130,20 @@ flow_branch_create(flow_branch_collection_t *collection, kdk_char32 *flow_branch
 flow_branch_collection_t *
 flow_branch_collection_create(kdk_mem_pool_t *mem_pool, kdk_uint32 mem_pool_size, kdk_uint32 prime)
 {
-    kdk_uint32           mem_pool_type = 1;
+    kdk_uint32           mem_pool_type = OTHER_MEM_POOL;
 
     if(mem_pool == KDK_NULL)
     {
         mem_pool = kdk_mem_pool_create(mem_pool_size, mem_pool_size);
         if(mem_pool == KDK_NULL)
             return KDK_NULL;
-        mem_pool_type = 0;
+        mem_pool_type = OWN_MEM_POOL;
     }
 
     flow_branch_collection_t *collection = (flow_branch_collection_t *)kdk_mem_pool_malloc(mem_pool, sizeof(flow_branch_collection_t));
     if(collection == KDK_NULL)
     {
-        if(mem_pool_type == 0)
+        if(mem_pool_type == OWN_MEM_POOL)
             kdk_mem_pool_destroy(mem_pool);
         return KDK_NULL;
     }
@@ -199,7 +170,7 @@ flow_branch_collection_destroy(flow_branch_collection_t *collection)
     if(collection == KDK_NULL)
         return ;
 
-    if(collection->mem_pool != KDK_NULL && collection->mem_pool_type == 0)
+    if(collection->mem_pool != KDK_NULL && collection->mem_pool_type == OWN_MEM_POOL)
     {
         kdk_mem_pool_destroy(collection->mem_pool);
     }
@@ -215,16 +186,11 @@ flow_branch_set(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id
                         offset      = 0, 
                         stepset     = 0, 
                         status      = PROCESS_NOR_STATUS,
-                        pre_status  = status;
+                        pre_status  = status,
+                        i           = 0;
     kdk_char32          temp_id[BRANCH_ID_LEN + 1] = {0};
-    //flow_branch_t      *main_branch, *branch, *branch_current;
-    //flow_node_t        *node, *node_current, *node_main_current;
-    flow_branch_t       *branch_main;
-    flow_branch_t       *branch_new;
-    flow_branch_t       *branch_current;
-    flow_node_t         *node_new;
-    flow_node_t         *node_current;
-    flow_node_t         *node_current_main;
+    flow_branch_t       *branch_main, *branch_new, *branch_current;
+    flow_node_t         *node_main, *node_new, *node_current;
 
     if(collection == KDK_NULL || flow_branch_id == KDK_NULL || flow_stream == KDK_NULL)
         return KDK_INARG;
@@ -233,13 +199,6 @@ flow_branch_set(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id
     if(branch_main == KDK_NULL)
         return KDK_NULLPTR;
 
-/*
-    branch_current = main_branch;
-    node_current   = main_branch->node_list;
-    node_main_current = node_current;
-*/
-
-    int i = 0;
     while(offset <= strlen(flow_stream))
     {
         pre_status = status;
@@ -254,8 +213,6 @@ flow_branch_set(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id
         if(strlen(temp_id) == 0)
             continue;
 
-
-
         if(pre_status == PROCESS_PRE_STATUS && status == PROCESS_ERR_STATUS)
         {
             branch_new = flow_branch_create(collection, temp_id);
@@ -268,7 +225,7 @@ flow_branch_set(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id
             branch_new->branch_next   = node_current->branch_flow;
             node_current->branch_flow = branch_new;
             branch_current            = branch_new;
-            node_current_main         = node_current;
+            node_main                 = node_current;
             node_current              = branch_new->node_list;
         }
         else if(pre_status == PROCESS_PRE_STATUS && status == PROCESS_NOR_STATUS)
@@ -293,7 +250,7 @@ flow_branch_set(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id
             if(status == PROCESS_NOR_STATUS)
             {
                 branch_current = branch_main;
-                node_current   = node_current_main;
+                node_current   = node_main;
             }
         }
         else if(pre_status == PROCESS_NOR_STATUS)
@@ -305,14 +262,14 @@ flow_branch_set(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id
             if(branch_main->node_list == KDK_NULL)
                 branch_main->node_list = node_new;
             else
-                node_current_main->next = node_new;
+                node_main->next = node_new;
 
-            node_current_main = node_new;
+            node_main = node_new;
 
             (branch_main->node_count)++;
 
             branch_current = branch_main;
-            node_current   = node_current_main;
+            node_current   = node_main;
         }
         else
         {
@@ -334,40 +291,32 @@ flow_branch_get(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id
     return (flow_branch_t *)kdk_hash_table_get_value(collection->branch_collection, flow_branch_id);
 }
 
-flow_branch_runtime_t *
-flow_branch_runtime_create(kdk_mem_pool_t *mem_pool, kdk_uint32 mem_pool_size,  kdk_char32 *flow_branch_id)
+flow_runtime_t *
+flow_runtime_create(kdk_mem_pool_t *mem_pool, kdk_uint32 mem_pool_size) 
 {
-    kdk_uint32           mem_pool_type = 1;
-
-    if(flow_branch_id == KDK_NULL)
-        return KDK_NULL;
+    kdk_uint32           mem_pool_type = OTHER_MEM_POOL;
 
     if(mem_pool == KDK_NULL)
     {
         mem_pool = kdk_mem_pool_create(mem_pool_size, mem_pool_size);
         if(mem_pool == KDK_NULL)
             return KDK_NULL;
-        mem_pool_type = 0;
+        mem_pool_type = OWN_MEM_POOL;
     }
 
-    flow_branch_runtime_t *runtime = (flow_branch_runtime_t *)kdk_mem_pool_malloc(mem_pool, sizeof(flow_branch_runtime_t));
+    flow_runtime_t *runtime = (flow_runtime_t *)kdk_mem_pool_malloc(mem_pool, sizeof(flow_runtime_t));
     if(runtime == KDK_NULL)
     {
-        if(mem_pool_type == 0)
+        if(mem_pool_type == OWN_MEM_POOL)
             kdk_mem_pool_destroy(mem_pool);
         return KDK_NULL;
     }
 
-    memset(runtime->id, 0, BRANCH_ID_LEN + 1);
-    strncpy(runtime->id, flow_branch_id, BRANCH_ID_LEN);
-    runtime->is_main        = FLOW_MAIN;
-    runtime->node_step      = 0;
-    runtime->branch_step    = 0;
     runtime->mem_pool_type  = mem_pool_type;
     runtime->mem_pool       = mem_pool;
     runtime->node_current   = KDK_NULL;
+    runtime->node_previous  = KDK_NULL;
     runtime->branch_current = KDK_NULL;
-    runtime->branch_main    = KDK_NULL;
 
     return runtime;
     
@@ -375,17 +324,25 @@ flow_branch_runtime_create(kdk_mem_pool_t *mem_pool, kdk_uint32 mem_pool_size,  
 
 
 kdk_uint32
-flow_branch_runtime_init(flow_branch_collection_t *collection, flow_branch_runtime_t *runtime)
+flow_runtime_init(flow_branch_collection_t *collection, flow_runtime_t *runtime, kdk_char32 *flow_branch_id)
 {
     flow_branch_t   *branch_main;  
 
-    branch_main = flow_branch_get(collection, runtime->id);
+    if(flow_branch_id == KDK_NULL)
+        return KDK_INARG;
+
+    branch_main = flow_branch_get(collection, flow_branch_id);
     if(branch_main == KDK_NULL)
         return KDK_NULLPTR;
 
+    memset(runtime->id, 0, BRANCH_ID_LEN + 1);
+    strncpy(runtime->id, flow_branch_id, BRANCH_ID_LEN);
+    runtime->is_main        = FLOW_MAIN;
+    runtime->node_step      = 0;
+    runtime->branch_step    = 0;
     runtime->node_current   = branch_main->node_list;
+    runtime->node_previous  = branch_main->node_list;
     runtime->branch_current = branch_main;
-    runtime->branch_main    = branch_main;
         
 
     return KDK_SUCCESS;
@@ -393,7 +350,7 @@ flow_branch_runtime_init(flow_branch_collection_t *collection, flow_branch_runti
 
 
 kdk_void
-flow_branch_runtime_clear(flow_branch_runtime_t *runtime)
+flow_runtime_clear(flow_runtime_t *runtime)
 {
     if(runtime == KDK_NULL)
         return ;
@@ -402,11 +359,11 @@ flow_branch_runtime_clear(flow_branch_runtime_t *runtime)
     runtime->is_main        = FLOW_MAIN;
     runtime->node_step      = 0;
     runtime->branch_step    = 0;
-    runtime->mem_pool_type  = mem_pool_type;
-    runtime->mem_pool       = mem_pool;
+    runtime->mem_pool_type  = OTHER_MEM_POOL;
+    runtime->mem_pool       = KDK_NULL;
     runtime->node_current   = KDK_NULL;
+    runtime->node_previous  = KDK_NULL;
     runtime->branch_current = KDK_NULL;
-    runtime->branch_main    = KDK_NULL;
 
     return ;
 }
@@ -418,10 +375,10 @@ flow_branch_runtime_clear(flow_branch_runtime_t *runtime)
  * If isSuccess is FAILURE, err_id shouldn't be KDK_NULL;
  * RETURN VALUE: KDK_SUCCESS  - exec success
  *             : KDK_NOTFOUND - exec success && not any NODE to exec
- *             : KDK_FAILURE  - exec failure && not any BRANCH / NODE to exec
+ *             : KDK_FAILURE  - exec failure && not any BRANCH to exec
  */
 kdk_uint32
-flow_branch_runtime_next(flow_branch_runtime_t *runtime, kdk_uint32 isSuccess, kdk_char32 *err_id, kdk_char32 *node_id)
+flow_runtime_next(flow_runtime_t *runtime, kdk_uint32 isSuccess, kdk_char32 *err_id, kdk_char32 *node_id)
 {
     if(runtime == KDK_NULL || node_id == KDK_NULL)
         return KDK_NULLPTR;
@@ -430,11 +387,11 @@ flow_branch_runtime_next(flow_branch_runtime_t *runtime, kdk_uint32 isSuccess, k
     {
         case PROCESS_SUCCESS:
                 if(runtime->node_current == KDK_NULL)
-                    return KDK_FAILURE;
+                    return KDK_NOTFOUND;
 
                 strncpy(node_id, runtime->node_current->id, NODE_ID_LEN);
-                if((runtime->node_current = runtime->node_current->next) == KDK_NULL)
-                    return KDK_NOTFOUND;
+                runtime->node_previous = runtime->node_current;
+                runtime->node_current  = runtime->node_current->next;
                 break;
 
         case PROCESS_FAILURE:
@@ -443,13 +400,13 @@ flow_branch_runtime_next(flow_branch_runtime_t *runtime, kdk_uint32 isSuccess, k
                 if(err_id == KDK_NULL)
                     return KDK_INARG;
 
-                runtime->branch_current = runtime->node_current->branch_flow;
+                runtime->branch_current = runtime->node_previous->branch_flow;
                 while(runtime->branch_current != KDK_NULL)
                 {
                     if(strcmp(runtime->branch_current->id, err_id) == 0)
                     {
                         runtime->node_current = runtime->branch_current->node_list;
-                        return flow_branch_runtime_next(runtime, isSuccess, KDK_NULL, node_id);
+                        return flow_runtime_next(runtime, PROCESS_SUCCESS, KDK_NULL, node_id);
                     }
                     runtime->branch_current = runtime->branch_current->branch_next;    
                 }
@@ -469,12 +426,12 @@ flow_branch_runtime_next(flow_branch_runtime_t *runtime, kdk_uint32 isSuccess, k
 
 
 kdk_void 
-flow_branch_runtime_destroy(flow_branch_runtime_t *runtime)
+flow_runtime_destroy(flow_runtime_t *runtime)
 {
     if(runtime == KDK_NULL)
         return ;
 
-    if(runtime->mem_pool != KDK_NULL && runtime->mem_pool_type == 0)
+    if(runtime->mem_pool != KDK_NULL && runtime->mem_pool_type == OWN_MEM_POOL)
     {
         kdk_mem_pool_destroy(runtime->mem_pool);
     }
@@ -484,27 +441,27 @@ flow_branch_runtime_destroy(flow_branch_runtime_t *runtime)
 
 
 kdk_void 
-flow_branch_print(flow_branch_t *main_branch)
+flow_branch_print(flow_branch_t *branch_main)
 {
     kdk_uint32      i = 0;
     flow_branch_t   *branch_current;
-    flow_node_t     *node_current, *node_sub_current, *node_current_main;
+    flow_node_t     *node_current, *node_sub_current, *node_main;
 
-    if(main_branch == KDK_NULL)
+    if(branch_main == KDK_NULL)
         return ;
 
-    branch_current = main_branch;
-    node_current   = main_branch->node_list;
-    node_current_main = main_branch->node_list;
+    branch_current = branch_main;
+    node_current   = branch_main->node_list;
+    node_main      = branch_main->node_list;
 
     fprintf(stderr, "\n");
     fprintf(stderr,     "[FLOWID:%s]\n", branch_current->id);
-    while(node_current_main != KDK_NULL)
+    while(node_main != KDK_NULL)
     {
         fprintf(stderr, "       |\n");
-        fprintf(stderr, "     [%3s]\n", node_current_main->id);
+        fprintf(stderr, "     [%3s]\n", node_main->id);
 
-        node_current = node_current_main;
+        node_current = node_main;
         branch_current = node_current->branch_flow;
 
         while(branch_current != KDK_NULL)
@@ -532,13 +489,10 @@ flow_branch_print(flow_branch_t *main_branch)
         }
         i = 0;
 
-        node_current_main = node_current_main->next;
+        node_main = node_main->next;
     }
     fprintf(stderr, "       |\n");
     fprintf(stderr, "     [end]\n");
 
     return ;
 }
-
-
-

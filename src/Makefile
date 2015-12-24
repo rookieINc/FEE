@@ -22,3 +22,6 @@ libfee.so:$(C_FILE)
 
 test:test.c $(C_FILE)
 	gcc -o test test.c $(INC_PATH) $(LIB_PATH) -lfee -lkdk
+
+clean:
+	rm -rf $(BIN_FILE) $(SO_FILE)
