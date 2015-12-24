@@ -1,8 +1,9 @@
 #include "flow_parse.h"
+#include "kdk_config.h"
 
 int main(int argc, char *argv[])
 {
-    kdk_uint32                   ret_code;
+    kdk_uint32                   ret_code, i;
     flow_branch_collection_t    *collection;
     flow_runtime_t              *runtime;
 
@@ -14,46 +15,13 @@ int main(int argc, char *argv[])
     }
     fprintf(stderr, "flow_branch_collection_create success!\n");
 
-    kdk_char32  flow_stream1[1024] = "001-002[DEF,00E-00F-00G]-003[DEF,00E-00F-00G][092,00G-00H][DEF,00E-00G]-004[DEF,00E-00F-00G]-005[DEF,00E-00F-00G][DEF,00E-00F-00G]-006";
-    kdk_char32  flow_stream2[1024] = "001-002[DEF,00E-00F-00G]-003[DEF,00E-00F-00G-004]-004[DEF,00E-00F-00G]-005[DEF,00E-00F-00G][092,003-004]-006";
-    kdk_char32  flow_stream3[1024] = "001-002-003-004-005-006";
-    kdk_char32  flow_stream4[1024] = "001-002-003[DEF,00E-00F-00G][092,00G-00H][DEF,00E-00F-00G]-004-005-006";
-
-    ret_code = flow_branch_set(collection, "SEV001", flow_stream1);
+    ret_code = flow_config_to_flow_branch_collection(argv[1], collection);
     if(ret_code)
     {
-        fprintf(stderr, "flow_branch_set error!\n");
+        fprintf(stderr, "flow_config_to_flow_branch_collection error!\n");
         return -1;
     }
-    fprintf(stderr, "FLOW:[%s]\n", flow_stream1);
-    fprintf(stderr, "Success!\n");
-
-    ret_code = flow_branch_set(collection, "SEV002", flow_stream2);
-    if(ret_code)
-    {
-        fprintf(stderr, "flow_branch_set error!\n");
-        return -1;
-    }
-    fprintf(stderr, "FLOW:[%s]\n", flow_stream2);
-    fprintf(stderr, "Success!\n");
-
-    ret_code = flow_branch_set(collection, "SEV003", flow_stream3);
-    if(ret_code)
-    {
-        fprintf(stderr, "flow_branch_set error!\n");
-        return -1;
-    }
-    fprintf(stderr, "FLOW:[%s]\n", flow_stream3);
-    fprintf(stderr, "Success!\n");
-
-    ret_code = flow_branch_set(collection, "SEV004", flow_stream4);
-    if(ret_code)
-    {
-        fprintf(stderr, "flow_branch_set error!\n");
-        return -1;
-    }
-    fprintf(stderr, "FLOW:[%s]\n", flow_stream4);
-    fprintf(stderr, "Success!\n");
+    fprintf(stderr, "flow_config_to_flow_branch_collection success!\n");
 
     runtime = flow_runtime_create(collection->mem_pool, 0);
     if(runtime == KDK_NULL)
@@ -76,7 +44,7 @@ int main(int argc, char *argv[])
     kdk_char32  err_code[5] = {0};
     while(1)
     {
-        fprintf(stderr, "FLOW:[%s]\n", flow_stream1);
+        //fprintf(stderr, "FLOW:[%s]\n", flow_stream1);
 
         memset(node_id, 0, sizeof(node_id));
         memset(err_code, 0, sizeof(err_code));
@@ -105,6 +73,14 @@ int main(int argc, char *argv[])
 
         fprintf(stderr, "[NODE_ID]:[%s]\n", node_id);
     }
+
+/*
+    kdk_char32  flow_stream1[1024] = "001-002[DEF,00E-00F-00G]-003[DEF,00E-00F-00G][092,00G-00H][DEF,00E-00G]-004[DEF,00E-00F-00G]-005[DEF,00E-00F-00G][DEF,00E-00F-00G]-006";
+    kdk_char32  flow_stream2[1024] = "001-002[DEF,00E-00F-00G]-003[DEF,00E-00F-00G-004]-004[DEF,00E-00F-00G]-005[DEF,00E-00F-00G][092,003-004]-006";
+    kdk_char32  flow_stream3[1024] = "001-002-003-004-005-006";
+    kdk_char32  flow_stream4[1024] = "001-002-003[DEF,00E-00F-00G][092,00G-00H][DEF,00E-00F-00G]-004-005-006";
+
+*/
 
     return 0;
 }

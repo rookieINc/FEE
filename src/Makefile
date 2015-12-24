@@ -5,7 +5,7 @@ LIB_PATH=-L$(FEE_PATH)/lib -L$(KDK_PATH)/lib
 
 SO_FILE=libfee.so
 H_FILE=flow_parse.h
-C_FILE=flow_parse.c
+C_FILE=flow_parse.c flow_load.c
 BIN_FILE=test
 
 .PHONY:ALL
@@ -18,7 +18,7 @@ lib_install:
 	cp $(SO_FILE) $(FEE_PATH)/lib/
 
 libfee.so:$(C_FILE)
-	gcc -o libfee.so -fpic -shared $(C_FILE) $(INC_PATH)
+	gcc -o libfee.so -fpic -shared $(C_FILE) $(INC_PATH) $(LIB_PATH) -lkdk
 
 test:test.c $(C_FILE)
 	gcc -o test test.c $(INC_PATH) $(LIB_PATH) -lfee -lkdk
