@@ -4,8 +4,8 @@ INC_PATH=-I$(FEE_PATH)/inc -I$(KDK_PATH)/inc
 LIB_PATH=-L$(FEE_PATH)/lib -L$(KDK_PATH)/lib
 
 SO_FILE=libfee.so
-H_FILE=flow_parse.h
-C_FILE=flow_parse.c flow_load.c
+H_FILE=flow_parse.h flow_load.h module_parse.h module_load.h
+C_FILE=flow_parse.c flow_load.c module_parse.c module_load.c
 BIN_FILE=test
 
 .PHONY:ALL

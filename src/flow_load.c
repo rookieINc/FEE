@@ -17,7 +17,7 @@ kdk_uint32
 flow_config_to_flow_branch_collection(kdk_char32 *file_name, flow_branch_collection_t *collection)
 {
     kdk_config_t    *flow_config;
-    kdk_char32       key[CONFIG_KEY_LEN], value[CONFIG_KEY_LEN], flow_head[CONFIG_KEY_LEN] = {0};
+    kdk_char32       key[CONFIG_KEY_LEN], value[CONFIG_VALUE_LEN], flow_head[CONFIG_KEY_LEN] = {0};
     kdk_uint32       ret_code = 0, flow_count, flow_count_len, i;
 
     if(file_name == KDK_NULL || collection == KDK_NULL)
@@ -68,10 +68,14 @@ flow_config_to_flow_branch_collection(kdk_char32 *file_name, flow_branch_collect
 
         memset(value, 0, sizeof(value));
         ret_code = kdk_config_get_value(flow_config, CONTENT, key, value);
-        if(ret_code)
+        if(ret_code && ret_code != KDK_NOTFOUND)
         {
             kdk_config_destroy(flow_config);
             return ret_code;
+        }
+        else if(ret_code == KDK_NOTFOUND)
+        {
+            continue ;
         }
 
         ret_code = flow_branch_set(collection, key, value);

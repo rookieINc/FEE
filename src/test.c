@@ -1,10 +1,12 @@
 #include "flow_parse.h"
+#include "module_parse.h"
 #include "kdk_config.h"
 
 int main(int argc, char *argv[])
 {
     kdk_uint32                   ret_code, i;
     flow_branch_collection_t    *collection;
+    module_collection_t         *module_collection;
     flow_runtime_t              *runtime;
 
     collection = flow_branch_collection_create(NULL, 1024, 3);
@@ -23,6 +25,22 @@ int main(int argc, char *argv[])
     }
     fprintf(stderr, "flow_config_to_flow_branch_collection success!\n");
 
+    module_collection = module_collection_create(NULL, 1024, 3);
+    if(module_collection == KDK_NULL)
+    {
+        fprintf(stderr, "module_collection_create error!\n");
+        return -1;
+    }
+    fprintf(stderr, "module_collection_create success!\n");
+
+    ret_code = module_config_to_module_collection(argv[2], module_collection);
+    if(ret_code)
+    {
+        fprintf(stderr, "module_config_to_module_collection error!\n");
+        return -1;
+    }
+    fprintf(stderr, "module_config_to_module_collection success!\n");
+
     runtime = flow_runtime_create(collection->mem_pool, 0);
     if(runtime == KDK_NULL)
     {
@@ -31,7 +49,7 @@ int main(int argc, char *argv[])
     }
     fprintf(stderr, "flow_runtime_create success!\n");
 
-    ret_code = flow_runtime_init(collection, runtime, "SEV001");
+    ret_code = flow_runtime_init(collection, runtime, "SERV01");
     if(ret_code)
     {
         fprintf(stderr, "flow_runtime_init error!\n");
@@ -39,6 +57,7 @@ int main(int argc, char *argv[])
     }
     fprintf(stderr, "flow_runtime_init success!\n");
 
+/*
     kdk_char32  node_id[7] = {0};
     kdk_uint32  isSuccess = 0;
     kdk_char32  err_code[5] = {0};
@@ -74,7 +93,6 @@ int main(int argc, char *argv[])
         fprintf(stderr, "[NODE_ID]:[%s]\n", node_id);
     }
 
-/*
     kdk_char32  flow_stream1[1024] = "001-002[DEF,00E-00F-00G]-003[DEF,00E-00F-00G][092,00G-00H][DEF,00E-00G]-004[DEF,00E-00F-00G]-005[DEF,00E-00F-00G][DEF,00E-00F-00G]-006";
     kdk_char32  flow_stream2[1024] = "001-002[DEF,00E-00F-00G]-003[DEF,00E-00F-00G-004]-004[DEF,00E-00F-00G]-005[DEF,00E-00F-00G][092,003-004]-006";
     kdk_char32  flow_stream3[1024] = "001-002-003-004-005-006";

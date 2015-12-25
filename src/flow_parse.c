@@ -334,6 +334,8 @@ flow_runtime_init(flow_branch_collection_t *collection, flow_runtime_t *runtime,
     branch_main = flow_branch_get(collection, flow_branch_id);
     if(branch_main == KDK_NULL)
         return KDK_NULLPTR;
+    else if(branch_main == KDK_NULLFOUND)
+        return KDK_NOTFOUND;
 
     memset(runtime->id, 0, BRANCH_ID_LEN + 1);
     strncpy(runtime->id, flow_branch_id, BRANCH_ID_LEN);
