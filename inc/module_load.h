@@ -18,6 +18,7 @@
 #include "module_parse.h"
 
 #define HEAD                "HEAD"
+#define MODULE_TYPE         "module_type"
 #define MODULE_COUNT        "module_count"
 #define MODULE_COUNT_LEN    "module_count_len"
 #define MODULE_PATH         "path"

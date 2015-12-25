@@ -33,6 +33,7 @@ typedef struct module_s module_t;
 
 struct module_collection_s
 {
+    kdk_uint32               module_type;
     kdk_uint32               mem_pool_type;
     struct kdk_mem_pool_s   *mem_pool;
     struct kdk_hash_table_s *module_collection;
@@ -45,5 +46,11 @@ module_collection_create(kdk_mem_pool_t *mem_pool, kdk_uint32 mem_pool_size, kdk
 
 kdk_void 
 module_collection_destroy(module_collection_t *collection);
+
+kdk_uint32 
+module_set(module_collection_t *collection, kdk_char32 *key, module_t *module);
+
+module_t *
+module_get(module_collection_t *collection, kdk_char32 *module_id);
 
 #endif /* _MODULE_PARSE_H_INCLUDED_ */

@@ -43,6 +43,7 @@ module_collection_create(kdk_mem_pool_t *mem_pool, kdk_uint32 mem_pool_size, kdk
     }
 
     memset(collection, 0, sizeof(module_collection_t));
+    collection->module_type       = 0;
     collection->mem_pool_type     = mem_pool_type;
     collection->mem_pool          = mem_pool;
     collection->module_collection = module_collection;
@@ -63,4 +64,18 @@ module_collection_destroy(module_collection_t *collection)
     }
 
     return ;
+}
+
+
+kdk_uint32 
+module_set(module_collection_t *collection, kdk_char32 *key, module_t *module)
+{
+    return kdk_hash_table_set_value(collection->module_collection, key, module, sizeof(module_t));
+}
+
+
+module_t *
+module_get(module_collection_t *collection, kdk_char32 *module_id)
+{
+    return (module_t *)kdk_hash_table_get_value(collection->module_collection, module_id);
 }
