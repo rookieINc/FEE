@@ -63,8 +63,6 @@ int main(int argc, char *argv[])
     kdk_char32  err_code[5] = {0};
     while(1)
     {
-        //fprintf(stderr, "FLOW:[%s]\n", flow_stream1);
-
         memset(node_id, 0, sizeof(node_id));
         memset(err_code, 0, sizeof(err_code));
 
