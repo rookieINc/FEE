@@ -1,6 +1,7 @@
 #include "flow_parse.h"
 #include "module_parse.h"
 #include "kdk_config.h"
+#include "kdk_dl.h"
 
 int main(int argc, char *argv[])
 {
@@ -9,6 +10,10 @@ int main(int argc, char *argv[])
     module_collection_t         *module_collection;
     flow_runtime_t              *runtime;
     module_t                    *module;
+    kdk_void (*func_test)(kdk_void);
+        kdk_char32                   path_file[48] = {0};
+        kdk_dl_handle_collection_t  *dl_handle_collection;
+        kdk_dl_handle_t              dl_handle;
 
     collection = flow_branch_collection_create(NULL, 1024, 101);
     if(collection == KDK_NULL)
@@ -58,19 +63,20 @@ int main(int argc, char *argv[])
     }
     fprintf(stderr, "flow_runtime_init success!\n");
 
+    dl_handle_collection = kdk_dl_handle_collection_create(KDK_NULL, 4096);
+    if(dl_handle_collection == KDK_NULL)
+    {
+        fprintf(stderr, "kdk_dl_handle_collection_create error!\n");
+        return -1;
+    }
+
     kdk_char32  node_id[7] = {0};
     kdk_uint32  isSuccess = 0;
     kdk_char32  err_code[5] = {0};
     while(1)
     {
-        memset(node_id, 0, sizeof(node_id));
-        memset(err_code, 0, sizeof(err_code));
-
-        fprintf(stderr, "Enter success flag:\n");
-        scanf("%d", &isSuccess);
-        fprintf(stderr, "Enter errCode flag:\n");
-        scanf("%s", err_code);
-
+        fprintf(stderr, "Success:%d\n", isSuccess);
+        fprintf(stderr, "err_code:%s\n", err_code);
         ret_code = flow_runtime_next(runtime, isSuccess, err_code, node_id);
         if(ret_code == KDK_NOTFOUND)
         {
@@ -97,14 +103,53 @@ int main(int argc, char *argv[])
         else if(module == KDK_NULLFOUND)
         {
             fprintf(stderr, "no module!\n");
-            break;
+            continue;
         }
 
+/*
         fprintf(stderr, "[ID:%s]\n", module->id);
         fprintf(stderr, "[PATH:%s]\n", module->path);
         fprintf(stderr, "[FILE:%s]\n", module->file_name);
         fprintf(stderr, "[FUNC:%s]\n", module->func_name);
+*/
+
+        memset(path_file, 0, sizeof(path_file));
+        sprintf(path_file, "%s/%s.so", module->path, module->file_name);
+
+        ret_code = kdk_dl_handle_collection_set(path_file, module->func_name, dl_handle_collection);
+        if(ret_code)
+        {
+            fprintf(stderr, "kdk_dl_handle_collection_set error!\n");
+            continue;
+        }
+
+        memset(&dl_handle, 0, sizeof(kdk_dl_handle_t));
+        ret_code = kdk_dl_handle_collection_get(dl_handle_collection, module->func_name, &dl_handle);
+        if(ret_code)
+        {
+            fprintf(stderr, "kdk_dl_handle_collection_get error!\n");
+            break;
+        }
+
+        fprintf(stderr, "dl_handle:%s\n", dl_handle.func_name);
+/*
+        func_test = kdk_dl_open(path_file, module->func_name);
+        if(func_test == KDK_NULL)
+           fprintf(stderr, "kdk_dl_open error!\n"); 
+
+        kdk_dl_close();
+*/
+
+        memset(node_id, 0, sizeof(node_id));
+        memset(err_code, 0, sizeof(err_code));
+
+        fprintf(stderr, "Enter success flag:\n");
+        scanf("%d", &isSuccess);
+        fprintf(stderr, "Enter errCode flag:\n");
+        scanf("%s", err_code);
     }
+
+    kdk_dl_handle_collection_destroy(dl_handle_collection);
 
 /*
     kdk_char32  flow_stream1[1024] = "001-002[DEF,00E-00F-00G]-003[DEF,00E-00F-00G][092,00G-00H][DEF,00E-00G]-004[DEF,00E-00F-00G]-005[DEF,00E-00F-00G][DEF,00E-00F-00G]-006";

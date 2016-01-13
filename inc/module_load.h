@@ -25,4 +25,10 @@
 #define MODULE_FILE_NAME    "file_name"
 #define MODULE_FUNC_NAME    "func_name"
 
+static kdk_uint32
+module_config_to_module(kdk_config_t *module_config, kdk_char32 *section, module_t *module);
+
+kdk_uint32    
+module_config_to_module_collection(kdk_char32 *file_name, module_collection_t *collection);
+
 #endif /* _MODULE_LOAD_H_INCLUDED_ */

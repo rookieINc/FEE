@@ -13,7 +13,7 @@
 
 #include "module_load.h"
 
-kdk_uint32
+static kdk_uint32
 module_config_to_module(kdk_config_t *module_config, kdk_char32 *section, module_t *module)
 {
     kdk_uint32  ret_code;

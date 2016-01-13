@@ -84,6 +84,11 @@ flow_config_to_flow_branch_collection(kdk_char32 *file_name, flow_branch_collect
             kdk_config_destroy(flow_config);
             return ret_code;
         }
+/*
+        flow_branch_t * flow = flow_branch_get(collection, key);
+        if(flow != KDK_NULL)
+            flow_branch_print(flow);
+*/
     }
 
     kdk_config_destroy(flow_config);

@@ -281,11 +281,13 @@ flow_branch_set(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id
     if(ret_code)
         return ret_code;
 
+//    flow_branch_print(branch_main);
+
     return KDK_SUCCESS;
 }
 
 
-static flow_branch_t *
+flow_branch_t *
 flow_branch_get(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id)
 {
     return (flow_branch_t *)kdk_hash_table_get_value(collection->branch_collection, flow_branch_id);
@@ -351,26 +353,6 @@ flow_runtime_init(flow_branch_collection_t *collection, flow_runtime_t *runtime,
 }
 
 
-kdk_void
-flow_runtime_clear(flow_runtime_t *runtime)
-{
-    if(runtime == KDK_NULL)
-        return ;
-    
-    memset(runtime->id, 0, BRANCH_ID_LEN + 1);
-    runtime->is_main        = FLOW_MAIN;
-    runtime->node_step      = 0;
-    runtime->branch_step    = 0;
-    runtime->mem_pool_type  = OTHER_MEM_POOL;
-    runtime->mem_pool       = KDK_NULL;
-    runtime->node_current   = KDK_NULL;
-    runtime->node_previous  = KDK_NULL;
-    runtime->branch_current = KDK_NULL;
-
-    return ;
-}
-
-
 /*
  * isSuccess : 0 - PROCESS_SUCCESS
  *             1 - PROCESS_FAILURE
@@ -424,6 +406,26 @@ flow_runtime_next(flow_runtime_t *runtime, kdk_uint32 isSuccess, kdk_char32 *err
         (runtime->node_step)++;
 
     return KDK_SUCCESS;
+}
+
+
+kdk_void
+flow_runtime_clear(flow_runtime_t *runtime)
+{
+    if(runtime == KDK_NULL)
+        return ;
+    
+    memset(runtime->id, 0, BRANCH_ID_LEN + 1);
+    runtime->is_main        = FLOW_MAIN;
+    runtime->node_step      = 0;
+    runtime->branch_step    = 0;
+    runtime->mem_pool_type  = OTHER_MEM_POOL;
+    runtime->mem_pool       = KDK_NULL;
+    runtime->node_current   = KDK_NULL;
+    runtime->node_previous  = KDK_NULL;
+    runtime->branch_current = KDK_NULL;
+
+    return ;
 }
 
 

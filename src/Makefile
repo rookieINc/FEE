@@ -21,7 +21,7 @@ libfee.so:$(C_FILE)
 	gcc -o libfee.so -fpic -shared $(C_FILE) $(INC_PATH) $(LIB_PATH) -lkdk
 
 test:test.c $(C_FILE)
-	gcc -o test test.c $(INC_PATH) $(LIB_PATH) -lfee -lkdk
+	gcc -o test test.c $(INC_PATH) $(LIB_PATH) -lfee -lkdk -ldl
 
 clean:
 	rm -rf $(BIN_FILE) $(SO_FILE)

@@ -77,10 +77,8 @@ struct flow_runtime_s
 typedef struct flow_runtime_s flow_runtime_t;
 
 
-
 static kdk_uint32 
-get_process_status_from_flow_stream(kdk_char32 *flow_stream, kdk_char32 *flow_branch_id, 
-                                    kdk_uint32 flow_branch_id_len, kdk_uint32 *process_status, kdk_uint32 *offset);
+get_process_status_from_flow_stream(kdk_char32 *flow_stream, kdk_char32 *flow_branch_id, kdk_uint32 flow_branch_id_len, kdk_uint32 *process_status, kdk_uint32 *offset);
 
 static flow_node_t *
 flow_node_create(flow_branch_collection_t *collection, kdk_char32 *flow_node_id);
@@ -97,7 +95,7 @@ flow_branch_collection_destroy(flow_branch_collection_t *collection);
 kdk_uint32 
 flow_branch_set(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id, kdk_char32 *flow_stream);
 
-static flow_branch_t *
+flow_branch_t *
 flow_branch_get(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id);
 
 flow_runtime_t *
@@ -105,6 +103,9 @@ flow_runtime_create(kdk_mem_pool_t *mem_pool, kdk_uint32 mem_pool_size);
 
 kdk_uint32
 flow_runtime_init(flow_branch_collection_t *collection, flow_runtime_t *runtime, kdk_char32 *flow_branch_id);
+
+kdk_uint32
+flow_runtime_next(flow_runtime_t *runtime, kdk_uint32 isSuccess, kdk_char32 *err_id, kdk_char32 *node_id);
 
 kdk_void
 flow_runtime_clear(flow_runtime_t *runtime);
