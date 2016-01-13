@@ -50,7 +50,7 @@ module_collection_destroy(module_collection_t *collection);
 kdk_uint32 
 module_set(module_collection_t *collection, kdk_char32 *key, module_t *module);
 
-module_t *
-module_get(module_collection_t *collection, kdk_char32 *module_id);
+kdk_uint32
+module_get(module_collection_t *collection, kdk_char32 *module_id, module_t *module);
 
 #endif /* _MODULE_PARSE_H_INCLUDED_ */

@@ -121,7 +121,7 @@ flow_branch_create(flow_branch_collection_t *collection, kdk_char32 *flow_branch
     strncpy(new_branch->id, flow_branch_id, BRANCH_ID_LEN);
     new_branch->node_count    = 0;
     new_branch->node_list     = KDK_NULL;
-    new_branch->branch_next   = KDK_NULL;
+    new_branch->branch_next   = new_branch;
 
     return new_branch;
 }
@@ -287,10 +287,24 @@ flow_branch_set(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id
 }
 
 
-flow_branch_t *
-flow_branch_get(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id)
+kdk_uint32
+flow_branch_get(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id, flow_branch_t *flow_branch)
 {
-    return (flow_branch_t *)kdk_hash_table_get_value(collection->branch_collection, flow_branch_id);
+    flow_branch_t   *ret_flow_branch; 
+
+    if(collection == KDK_NULL || flow_branch_id == KDK_NULL || flow_branch == KDK_NULL)
+        return KDK_INARG;
+
+    ret_flow_branch = (flow_branch_t *)kdk_hash_table_get_value(collection->branch_collection, flow_branch_id);
+    if(ret_flow_branch == KDK_NULL)
+        return KDK_NULLPTR;
+    else if(ret_flow_branch == KDK_NULLFOUND)
+        return KDK_NOTFOUND;
+
+    memset(flow_branch, 0, sizeof(flow_branch_t));
+    memcpy(flow_branch, ret_flow_branch, sizeof(flow_branch_t));
+
+    return KDK_SUCCESS;
 }
 
 flow_runtime_t *
@@ -328,25 +342,24 @@ flow_runtime_create(kdk_mem_pool_t *mem_pool, kdk_uint32 mem_pool_size)
 kdk_uint32
 flow_runtime_init(flow_branch_collection_t *collection, flow_runtime_t *runtime, kdk_char32 *flow_branch_id)
 {
-    flow_branch_t   *branch_main;  
+    kdk_uint32      ret_code;
+    flow_branch_t   branch_main;  
 
     if(flow_branch_id == KDK_NULL)
         return KDK_INARG;
 
-    branch_main = flow_branch_get(collection, flow_branch_id);
-    if(branch_main == KDK_NULL)
-        return KDK_NULLPTR;
-    else if(branch_main == KDK_NULLFOUND)
-        return KDK_NOTFOUND;
+    ret_code = flow_branch_get(collection, flow_branch_id, &branch_main);
+    if(ret_code)
+        return ret_code;
 
     memset(runtime->id, 0, BRANCH_ID_LEN + 1);
     strncpy(runtime->id, flow_branch_id, BRANCH_ID_LEN);
     runtime->is_main        = FLOW_MAIN;
     runtime->node_step      = 0;
     runtime->branch_step    = 0;
-    runtime->node_current   = branch_main->node_list;
-    runtime->node_previous  = branch_main->node_list;
-    runtime->branch_current = branch_main;
+    runtime->node_current   = branch_main.node_list;
+    runtime->node_previous  = branch_main.node_list;
+    runtime->branch_current = branch_main.branch_next;
         
 
     return KDK_SUCCESS;

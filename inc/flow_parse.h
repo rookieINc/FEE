@@ -95,8 +95,8 @@ flow_branch_collection_destroy(flow_branch_collection_t *collection);
 kdk_uint32 
 flow_branch_set(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id, kdk_char32 *flow_stream);
 
-flow_branch_t *
-flow_branch_get(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id);
+kdk_uint32
+flow_branch_get(flow_branch_collection_t *collection, kdk_char32 *flow_branch_id, flow_branch_t *flow_branch);
 
 flow_runtime_t *
 flow_runtime_create(kdk_mem_pool_t *mem_pool, kdk_uint32 mem_pool_size);

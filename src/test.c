@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     flow_branch_collection_t    *collection;
     module_collection_t         *module_collection;
     flow_runtime_t              *runtime;
-    module_t                    *module;
+    module_t                     module;
     kdk_void (*func_test)(kdk_void);
         kdk_char32                   path_file[48] = {0};
         kdk_dl_handle_collection_t  *dl_handle_collection;
@@ -94,13 +94,13 @@ int main(int argc, char *argv[])
             break;
         }
 
-        module = module_get(module_collection, node_id);
-        if(module == KDK_NULL && module != KDK_NULLFOUND)
+        ret_code = module_get(module_collection, node_id, &module);
+        if(ret_code == KDK_NULLPTR && ret_code != KDK_NOTFOUND)
         {
             fprintf(stderr, "module_get error!\n");
             break;
         }
-        else if(module == KDK_NULLFOUND)
+        else if(ret_code == KDK_NOTFOUND)
         {
             fprintf(stderr, "no module!\n");
             continue;
@@ -114,9 +114,9 @@ int main(int argc, char *argv[])
 */
 
         memset(path_file, 0, sizeof(path_file));
-        sprintf(path_file, "%s/%s.so", module->path, module->file_name);
+        sprintf(path_file, "%s/%s.so", module.path, module.file_name);
 
-        ret_code = kdk_dl_handle_collection_set(path_file, module->func_name, dl_handle_collection);
+        ret_code = kdk_dl_handle_collection_set(path_file, module.func_name, dl_handle_collection);
         if(ret_code)
         {
             fprintf(stderr, "kdk_dl_handle_collection_set error!\n");
@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
         }
 
         memset(&dl_handle, 0, sizeof(kdk_dl_handle_t));
-        ret_code = kdk_dl_handle_collection_get(dl_handle_collection, module->func_name, &dl_handle);
+        ret_code = kdk_dl_handle_collection_get(dl_handle_collection, module.func_name, &dl_handle);
         if(ret_code)
         {
             fprintf(stderr, "kdk_dl_handle_collection_get error!\n");
@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
 
         fprintf(stderr, "dl_handle:%s\n", dl_handle.func_name);
 /*
-        func_test = kdk_dl_open(path_file, module->func_name);
+        func_test = kdk_dl_open(path_file, module.func_name);
         if(func_test == KDK_NULL)
            fprintf(stderr, "kdk_dl_open error!\n"); 
 

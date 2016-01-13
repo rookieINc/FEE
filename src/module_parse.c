@@ -70,12 +70,29 @@ module_collection_destroy(module_collection_t *collection)
 kdk_uint32 
 module_set(module_collection_t *collection, kdk_char32 *key, module_t *module)
 {
+    if(collection == KDK_NULL || key == KDK_NULL || module == KDK_NULL)
+        return KDK_INARG;
+
     return kdk_hash_table_set_value(collection->module_collection, key, module, sizeof(module_t));
 }
 
 
-module_t *
-module_get(module_collection_t *collection, kdk_char32 *module_id)
+kdk_uint32
+module_get(module_collection_t *collection, kdk_char32 *module_id, module_t *module)
 {
-    return (module_t *)kdk_hash_table_get_value(collection->module_collection, module_id);
+    module_t    *ret_module;
+
+    if(collection == KDK_NULL || module_id == KDK_NULL || module == KDK_NULL)
+        return KDK_INARG;
+
+    ret_module = (module_t *)kdk_hash_table_get_value(collection->module_collection, module_id);
+    if(ret_module == KDK_NULL)
+        return KDK_NULLPTR;        
+    else if(ret_module == KDK_NULLFOUND)
+        return KDK_NOTFOUND;
+
+    memset(module, 0, sizeof(module_t));
+    memcpy(module, ret_module, sizeof(module_t));
+
+    return KDK_SUCCESS;
 }
