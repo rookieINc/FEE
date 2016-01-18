@@ -18,6 +18,9 @@ module_config_to_module(kdk_config_t *module_config, kdk_char32 *section, module
 {
     kdk_uint32  ret_code;
 
+    if(module_config == KDK_NULL || module == KDK_NULL)
+        return KDK_INARG;
+
     memset(module, 0, sizeof(module_t));
 
     strncpy(module->id, section, NODE_ID_LEN);
@@ -38,24 +41,25 @@ module_config_to_module(kdk_config_t *module_config, kdk_char32 *section, module
 }
 
 kdk_uint32    
-module_config_to_module_collection(kdk_char32 *file_name, module_collection_t *collection)
+module_config_file_to_module_coll(kdk_char32 *module_config_file, module_coll_t *module_coll)
 {
     kdk_config_t    *module_config;
     module_t         module;
     kdk_char32       section[CONFIG_KEY_LEN], value[CONFIG_VALUE_LEN];
     kdk_uint32       ret_code = 0, module_count, module_count_len, i;
 
-    if(file_name == KDK_NULL || collection == KDK_NULL)
+    if(module_config_file == KDK_NULL || module_coll == KDK_NULL)
         return KDK_INARG;
 
-    module_config = kdk_config_create(KDK_NULL, 1024, file_name);
+    module_config = kdk_config_create(KDK_NULL, 1024, module_config_file);
     if(module_config == KDK_NULL)
         return KDK_NULLPTR;
 
-    ret_code = kdk_config_parse(module_config);
+    ret_code = kdk_config_init(module_config);
     if(ret_code)
     {
         kdk_config_destroy(module_config);
+        module_config = KDK_NULL;
         return ret_code;
     }
 
@@ -64,15 +68,17 @@ module_config_to_module_collection(kdk_char32 *file_name, module_collection_t *c
     if(ret_code)
     {
         kdk_config_destroy(module_config);
+        module_config = KDK_NULL;
         return ret_code;
     }
-    collection->module_type = atoi(value);
+    module_coll->type = atoi(value);
 
     memset(value, 0, sizeof(value));
     ret_code = kdk_config_get_value(module_config, HEAD, MODULE_COUNT, value);
     if(ret_code)
     {
         kdk_config_destroy(module_config);
+        module_config = KDK_NULL;
         return ret_code;
     }
     module_count = atoi(value);
@@ -82,6 +88,7 @@ module_config_to_module_collection(kdk_char32 *file_name, module_collection_t *c
     if(ret_code)
     {
         kdk_config_destroy(module_config);
+        module_config = KDK_NULL;
         return ret_code;
     }
     module_count_len = atoi(value);
@@ -95,6 +102,7 @@ module_config_to_module_collection(kdk_char32 *file_name, module_collection_t *c
         if(ret_code && ret_code != KDK_NOTFOUND)
         {
             kdk_config_destroy(module_config);
+            module_config = KDK_NULL;
             return ret_code;
         }
         else if(ret_code == KDK_NOTFOUND)
@@ -102,15 +110,17 @@ module_config_to_module_collection(kdk_char32 *file_name, module_collection_t *c
             continue;
         }
 
-        ret_code = module_set(collection, section, &module);
+        ret_code = module_coll_set(module_coll, section, &module);
         if(ret_code)
         {
             kdk_config_destroy(module_config);
+            module_config = KDK_NULL;
             return ret_code;
         }
     }
 
     kdk_config_destroy(module_config);
+    module_config = KDK_NULL;
 
     return KDK_SUCCESS;
 }

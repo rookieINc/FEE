@@ -29,6 +29,6 @@ static kdk_uint32
 module_config_to_module(kdk_config_t *module_config, kdk_char32 *section, module_t *module);
 
 kdk_uint32    
-module_config_to_module_collection(kdk_char32 *file_name, module_collection_t *collection);
+module_config_file_to_module_coll(kdk_char32 *module_config_file, module_coll_t *module_coll);
 
 #endif /* _MODULE_LOAD_H_INCLUDED_ */

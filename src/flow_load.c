@@ -13,21 +13,22 @@
 
 #include "flow_load.h"
 
+
 kdk_uint32    
-flow_config_to_flow_branch_collection(kdk_char32 *file_name, flow_branch_collection_t *collection)
+flow_config_file_to_flow_coll(kdk_char32 *flow_config_file, flow_coll_t *flow_coll)
 {
     kdk_config_t    *flow_config;
     kdk_char32       key[CONFIG_KEY_LEN], value[CONFIG_VALUE_LEN], flow_head[CONFIG_KEY_LEN] = {0};
     kdk_uint32       ret_code = 0, flow_count, flow_count_len, i;
 
-    if(file_name == KDK_NULL || collection == KDK_NULL)
+    if(flow_config_file == KDK_NULL || flow_coll == KDK_NULL)
         return KDK_INARG;
 
-    flow_config = kdk_config_create(KDK_NULL, 1024, file_name);
+    flow_config = kdk_config_create(KDK_NULL, 1024, flow_config_file);
     if(flow_config == KDK_NULL)
         return KDK_NULLPTR;
 
-    ret_code = kdk_config_parse(flow_config);
+    ret_code = kdk_config_init(flow_config);
     if(ret_code)
     {
         kdk_config_destroy(flow_config);
@@ -78,14 +79,14 @@ flow_config_to_flow_branch_collection(kdk_char32 *file_name, flow_branch_collect
             continue ;
         }
 
-        ret_code = flow_branch_set(collection, key, value);
+        ret_code = flow_coll_set(flow_coll, key, value);
         if(ret_code)
         {
             kdk_config_destroy(flow_config);
             return ret_code;
         }
 /*
-        flow_branch_t * flow = flow_branch_get(collection, key);
+        flow_branch_t * flow = flow_branch_get(flow_coll, key);
         if(flow != KDK_NULL)
             flow_branch_print(flow);
 */

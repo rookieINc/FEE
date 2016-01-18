@@ -31,26 +31,26 @@ struct module_s
 
 typedef struct module_s module_t;
 
-struct module_collection_s
+struct module_coll_s
 {
-    kdk_uint32               module_type;
+    kdk_uint32               type;
     kdk_uint32               mem_pool_type;
     struct kdk_mem_pool_s   *mem_pool;
-    struct kdk_hash_table_s *module_collection;
+    struct kdk_hash_table_s *coll;
 };
 
-typedef struct module_collection_s module_collection_t;
+typedef struct module_coll_s module_coll_t;
 
-module_collection_t*
-module_collection_create(kdk_mem_pool_t *mem_pool, kdk_uint32 mem_pool_size, kdk_uint32 prime);
-
-kdk_void 
-module_collection_destroy(module_collection_t *collection);
+module_coll_t*
+module_coll_create(kdk_mem_pool_t *mem_pool, kdk_uint32 mem_pool_size, kdk_uint32 prime);
 
 kdk_uint32 
-module_set(module_collection_t *collection, kdk_char32 *key, module_t *module);
+module_coll_set(module_coll_t *module_coll, kdk_char32 *key, module_t *module);
 
 kdk_uint32
-module_get(module_collection_t *collection, kdk_char32 *module_id, module_t *module);
+module_coll_get(module_coll_t *module_coll, kdk_char32 *module_id, module_t *module);
+
+kdk_void 
+module_coll_destroy(module_coll_t *module_coll);
 
 #endif /* _MODULE_PARSE_H_INCLUDED_ */

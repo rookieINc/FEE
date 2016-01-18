@@ -24,6 +24,6 @@
 #define FLOW_COUNT_LEN  "flow_count_len"
 
 kdk_uint32    
-flow_config_to_flow_branch_collection(kdk_char32 *file_name, flow_branch_collection_t *collection);
+flow_config_file_to_flow_coll(kdk_char32 *flow_config_file, flow_coll_t *flow_coll);
 
 #endif /* _FLOW_LOAD_H_INCLUDED_ */
