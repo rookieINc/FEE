@@ -15,6 +15,22 @@
 
 int hello(void)
 {
-    fprintf(stderr, "Hello, world!\n");
+    fprintf(stderr, "Hello, world![%d]\n", getpid());
+    return 0;
+}
+
+int main(int argc, char *argv[])
+{
+    int  i;
+
+    for(i = 0; i < argc; i++)
+        fprintf(stderr, "[ARG:%s]\n", argv[i]);
+
+    while(1)
+    {
+        hello();
+        sleep(2);
+    }
+
     return 0;
 }

@@ -32,6 +32,7 @@ flow_config_file_to_flow_coll(kdk_char32 *flow_config_file, flow_coll_t *flow_co
     if(ret_code)
     {
         kdk_config_destroy(flow_config);
+        flow_config = KDK_NULL;
         return ret_code;
     }
 
@@ -40,6 +41,7 @@ flow_config_file_to_flow_coll(kdk_char32 *flow_config_file, flow_coll_t *flow_co
     if(ret_code)
     {
         kdk_config_destroy(flow_config);
+        flow_config = KDK_NULL;
         return ret_code;
     }
     flow_count = atoi(value);
@@ -49,6 +51,7 @@ flow_config_file_to_flow_coll(kdk_char32 *flow_config_file, flow_coll_t *flow_co
     if(ret_code)
     {
         kdk_config_destroy(flow_config);
+        flow_config = KDK_NULL;
         return ret_code;
     }
     flow_count_len = atoi(value);
@@ -58,6 +61,7 @@ flow_config_file_to_flow_coll(kdk_char32 *flow_config_file, flow_coll_t *flow_co
     if(ret_code)
     {
         kdk_config_destroy(flow_config);
+        flow_config = KDK_NULL;
         return ret_code;
     }
     strncpy(flow_head, value, strlen(value));
@@ -72,6 +76,7 @@ flow_config_file_to_flow_coll(kdk_char32 *flow_config_file, flow_coll_t *flow_co
         if(ret_code && ret_code != KDK_NOTFOUND)
         {
             kdk_config_destroy(flow_config);
+            flow_config = KDK_NULL;
             return ret_code;
         }
         else if(ret_code == KDK_NOTFOUND)
@@ -83,6 +88,7 @@ flow_config_file_to_flow_coll(kdk_char32 *flow_config_file, flow_coll_t *flow_co
         if(ret_code)
         {
             kdk_config_destroy(flow_config);
+            flow_config = KDK_NULL;
             return ret_code;
         }
 /*
@@ -93,6 +99,7 @@ flow_config_file_to_flow_coll(kdk_char32 *flow_config_file, flow_coll_t *flow_co
     }
 
     kdk_config_destroy(flow_config);
+    flow_config = KDK_NULL;
 
     return KDK_SUCCESS;
 }

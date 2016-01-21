@@ -164,13 +164,17 @@ int main(int argc, char *argv[])
     }
     fprintf(stderr, "engine_create success!\n");
 
+    fprintf(stderr, "%s\n%s\n", argv[1], argv[2]);
+
     ret_code = engine_config_init(engine->config, argv[1], argv[2]);
     if(ret_code)
     {
-        fprintf(stderr, "engine_config_init error!\n");
+        fprintf(stderr, "engine_config_init error![ERR:%p]\n", ret_code);
         return KDK_NULLPTR;
     }
     fprintf(stderr, "engine_config_init success!\n");
+
+    //daemonize(DAEMON_NO_CLOSE_FILES | DAEMON_NO_REOPEN_STD_FDS);
 
     for(i = 0; i < 100000000; i++)
     {
@@ -211,4 +215,6 @@ int main(int argc, char *argv[])
 
     engine_destroy(engine);
     engine = KDK_NULL;
+
+    return KDK_SUCCESS;
 }

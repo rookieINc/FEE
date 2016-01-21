@@ -1,0 +1,3 @@
+killall -9 engine_daemon
+killall -9 printTest
+killall -9 demo
