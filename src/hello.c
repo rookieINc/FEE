@@ -12,6 +12,7 @@
 
 
 #include <stdio.h>
+#include "kdk.h"
 
 int hello(void)
 {
@@ -21,16 +22,30 @@ int hello(void)
 
 int main(int argc, char *argv[])
 {
+    kdk_uint32  ret_code;
     int  i;
 
     for(i = 0; i < argc; i++)
         fprintf(stderr, "[ARG:%s]\n", argv[i]);
 
+    ret_code = kdk_log_init(0,0,".","test");
+    if(ret_code)
+    {
+        fprintf(stderr, "kdk_log_init error![%p]\n", ret_code);
+        return -1;
+    }
+
+    kdk_log_destroy();
+
+    fprintf(stderr, "over!\n");
+
+/*
     while(1)
     {
         hello();
         sleep(2);
     }
+*/
 
     return 0;
 }

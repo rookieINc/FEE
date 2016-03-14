@@ -2,16 +2,16 @@
 /************************************************************
  * Copyright(C), 2015-2016, QTPAY
  * 
- * FileName    : engine_daemon.c
+ * FileName    : daemon.c
  * Author      : rookieINc
  * Version     : v0.1.0
  * Date        : 2016-01-18 18:16
- * Description : engine_daemon.c
+ * Description : daemon.c
  * History     : 
  ***********************************************************/
 
 
-#include "engine_daemon.h"
+#include "daemon.h"
 
 daemon_config_t *
 daemon_config_create(kdk_mem_pool_t *mem_pool, kdk_uint32 mem_pool_size)
@@ -209,7 +209,7 @@ main(kdk_uint32 argc, kdk_char32 *argv[])
 
     if(argc != 2)
     {
-        fprintf(stderr, "USAGE:\n\tengine_daemon [CONFIG_FILE]\n");
+        fprintf(stderr, "USAGE:\n\tdaemon [CONFIG_FILE]\n");
         return KDK_INARG;
     }
 

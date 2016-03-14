@@ -9,6 +9,12 @@ int main(int argc, char *argv[])
     kdk_dl_handle_t dl_handle;   
     kdk_char32  path_file[124];
 
+    if(argc != 3)
+    {
+        fprintf(stderr, "wrong!\n");
+        return KDK_INARG;
+    }
+
     engine = engine_create(KDK_NULL, 4096);
     if(engine == KDK_NULL)
     {
@@ -29,7 +35,7 @@ int main(int argc, char *argv[])
 
     daemonize(DAEMON_NO_CLOSE_FILES | DAEMON_NO_REOPEN_STD_FDS);
 
-    for(i = 0; i < 1; i++)
+    while(1)
     {
         ret_code = engine_runtime_init(engine->runtime, engine->config, "SERV01");
         if(ret_code)
