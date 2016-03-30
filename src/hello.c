@@ -31,13 +31,21 @@ int main(int argc, char *argv[])
     ret_code = kdk_log_init(0,0,".","test");
     if(ret_code)
     {
-        fprintf(stderr, "kdk_log_init error![%p]\n", ret_code);
+        fprintf(stderr, "kdk_log_init error![%d]\n", ret_code);
         return -1;
     }
+
+    KLOG(ERROR, "%s", "hello");
 
     kdk_log_destroy();
 
     fprintf(stderr, "over!\n");
+
+    ret_code = kdk_log_init(0,0,".","test");
+
+    KLOG(ERROR, "%s", "test");
+
+    kdk_log_destroy();
 
 /*
     while(1)

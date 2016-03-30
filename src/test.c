@@ -9,31 +9,43 @@ int main(int argc, char *argv[])
     kdk_dl_handle_t dl_handle;   
     kdk_char32  path_file[124];
 
-    if(argc != 3)
+    if(argc != 4)
     {
         fprintf(stderr, "wrong!\n");
         return KDK_INARG;
     }
 
-    engine = engine_create(KDK_NULL, 4096);
+    engine = engine_create(KDK_NULL, 14096);
     if(engine == KDK_NULL)
     {
-        fprintf(stderr, "engine_create error!\n");
+        fprintf(stderr, "引擎[创建]失败[%d]...\n", ret_code);
         return KDK_NULLPTR;
     }
-    fprintf(stderr, "engine_create success!\n");
+    fprintf(stderr, "...\n");
+    fprintf(stderr, "引擎[创建]成功...\n");
 
-    fprintf(stderr, "%s\n%s\n", argv[1], argv[2]);
+    fprintf(stderr, "配置文件[初始化]...\n");
+    fprintf(stderr, "流程配置文件[FLOW]   : %s\n", argv[1]);
+    fprintf(stderr, "模块配置文件[MODULE] : %s\n", argv[2]);
+    fprintf(stderr, "日志配置文件[LOG]    : %s\n", argv[3]);
 
-    ret_code = engine_config_init(engine->config, argv[1], argv[2]);
+    ret_code = engine_config_init(engine->config, argv[1], argv[2], argv[3]);
     if(ret_code)
     {
-        fprintf(stderr, "engine_config_init error![ERR:%p]\n", ret_code);
+        fprintf(stderr, "配置文件[初始化]失败[%d]...\n", ret_code);
         return KDK_NULLPTR;
     }
-    fprintf(stderr, "engine_config_init success!\n");
+    fprintf(stderr, "配置文件[初始化]成功...\n");
 
-    daemonize(DAEMON_NO_CLOSE_FILES | DAEMON_NO_REOPEN_STD_FDS);
+    ret_code = kdk_log_init(0, engine->config->log->level, engine->config->log->file_path, engine->config->log->file_name);
+    if(ret_code)
+    {
+        fprintf(stderr, "日志[初始化]失败[%d]...", ret_code);
+        return KDK_NULLPTR;
+    }
+    KLOG(INFO, "日志[初始化]成功...");
+
+    //daemonize(DAEMON_NO_CHDIR | DAEMON_NO_CLOSE_FILES | DAEMON_NO_REOPEN_STD_FDS);
 
     while(1)
     {
@@ -50,7 +62,7 @@ int main(int argc, char *argv[])
             ret_code = flow_runtime_next(engine->runtime->flow_runtime, is_succ, KDK_NULL, node_id);
             if(ret_code == KDK_NOTFOUND)
             {
-                fprintf(stderr, "flow_runtime_next finish!\n");
+            //  fprintf(stderr, "flow_runtime_next finish!\n");
                 break;
             }
             else if(ret_code == KDK_FAILURE)
@@ -64,7 +76,7 @@ int main(int argc, char *argv[])
                 break;
             }
 
-            fprintf(stderr, "node:%s\n", node_id);
+//            fprintf(stderr, "node:%s\n", node_id);
 
             memset(&module, 0, sizeof(module_t));
             ret_code = module_coll_get(engine->config->module_coll, node_id, &module);
@@ -80,10 +92,12 @@ int main(int argc, char *argv[])
                 continue;
             }
 
+/*
             fprintf(stderr, "[ID:%s]\n", module.id);
             fprintf(stderr, "[PATH:%s]\n", module.path);
             fprintf(stderr, "[FILE:%s]\n", module.file_name);
             fprintf(stderr, "[FUNC:%s]\n", module.func_name);
+*/
 
             memset(path_file, 0, sizeof(path_file));
             sprintf(path_file, "%s/%s.so", module.path, module.file_name);
@@ -96,7 +110,7 @@ int main(int argc, char *argv[])
                 break;
             }
 
-            fprintf(stderr, "dl_handle:%s\n", dl_handle.func_name);
+//            KLOG(INFO, "dl_handle:%s\n", dl_handle.func_name);
         }
 
         engine_runtime_clear(engine->runtime);

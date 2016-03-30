@@ -19,6 +19,11 @@
 #define DAEMON      "DAEMON"
 #define SLEEP_TIME  "sleep_time"
 
+#define LOG         "LOG"
+#define LOG_PATH    "log_path"
+#define LOG_NAME    "log_name"
+#define LOG_LEVEL   "log_level"
+
 #define PROCESS     "PROCESS"
 #define PROC_COUNT  "process_count"
 #define PROC_PATH   "process_path"
@@ -27,13 +32,12 @@
 #define ARGUMENT    "ARGUMENT"
 #define ARG_COUNT   "argument_count"
 
-#define PATH_LEN    48
-#define NAME_LEN    48
-#define ARG_LEN     10
-
 struct daemon_config_s
 {
     kdk_uint32              sleep_time;
+    kdk_char32              log_path[PATH_LEN + 1];
+    kdk_char32              log_name[NAME_LEN + 1];
+    kdk_uint32              log_level;
     kdk_uint32              proc_count;
     kdk_char32              proc_path[PATH_LEN + 1];  
     kdk_char32              proc_name[NAME_LEN + 1];  

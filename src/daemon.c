@@ -70,6 +70,7 @@ daemon_config_init(daemon_config_t *daemon_config, kdk_char32 *daemon_config_fil
 
     //memset(config, 0, sizeof(config_t));
 
+    // PART [DAEMON]
     memset(value, 0, sizeof(value));
     ret_code = kdk_config_get_value(config, DAEMON, SLEEP_TIME, value);
     if(ret_code)
@@ -80,6 +81,30 @@ daemon_config_init(daemon_config_t *daemon_config, kdk_char32 *daemon_config_fil
     }
     daemon_config->sleep_time = atoi(value);
 
+    // PART [LOG]
+    memset(value, 0, sizeof(value));
+    kdk_config_get_value(config, LOG, LOG_PATH, value);
+    strncpy(daemon_config->log_path, value, PATH_LEN);
+
+    memset(value, 0, sizeof(value));
+    kdk_config_get_value(config, LOG, LOG_NAME, value);
+    strncpy(daemon_config->log_name, value, NAME_LEN);
+
+    memset(value, 0, sizeof(value));
+    kdk_config_get_value(config, LOG, LOG_LEVEL, value);
+
+    if(strcmp(value, "DEBUG") == 0)
+        daemon_config->log_level = LOG_LEVEL_DEBUG;
+    else if(strcmp(value, "INFO") == 0)
+        daemon_config->log_level = LOG_LEVEL_INFO;
+    else if(strcmp(value, "WARN") == 0)
+        daemon_config->log_level = LOG_LEVEL_WARN;
+    else if(strcmp(value, "ERROR") == 0)
+        daemon_config->log_level = LOG_LEVEL_ERROR;
+    else
+        daemon_config->log_level = LOG_LEVEL_DEBUG;
+
+    // PART [PROCESS]
     memset(value, 0, sizeof(value));
     ret_code = kdk_config_get_value(config, PROCESS, PROC_COUNT, value);
     if(ret_code)
@@ -110,6 +135,7 @@ daemon_config_init(daemon_config_t *daemon_config, kdk_char32 *daemon_config_fil
     }
     strncpy(daemon_config->proc_name, value, NAME_LEN);
 
+    // PART [ARGUMENT]
     memset(value, 0, sizeof(value));
     ret_code = kdk_config_get_value(config, ARGUMENT, ARG_COUNT, value);
     if(ret_code)    
@@ -216,35 +242,55 @@ main(kdk_uint32 argc, kdk_char32 *argv[])
     daemon_config = daemon_config_create(KDK_NULL, 1024);
     if(daemon_config == KDK_NULL)
     {
-        fprintf(stderr, "ENGINE_DAEMON config create failure!\n");
+        fprintf(stderr, "守护进程配置[创建]失败...\n"); 
         return KDK_INARG;
     }
-    fprintf(stderr, "ENGINE_DAEMON config create success!\n");
+    fprintf(stderr, "守护进程配置[创建]成功...\n"); 
 
     ret_code = daemon_config_init(daemon_config, argv[1]);
     if(ret_code)
     {
-        fprintf(stderr, "ENGINE_DAEMON config init failure![ERR:%p]\n", ret_code);
+        fprintf(stderr, "守护进程配置[初始化]失败...\n"); 
         return KDK_INARG;
     }
-    fprintf(stderr, "ENGINE_DAEMON config init success!\n");
-
-    daemonize(DAEMON_NO_CHDIR | DAEMON_NO_CLOSE_FILES | DAEMON_NO_REOPEN_STD_FDS);
+    fprintf(stderr, "守护进程配置[初始化]成功...\n"); 
 
     for(proc_count = 0; proc_count < daemon_config->proc_count; proc_count++)
+    {
+        fprintf(stderr, "进程[%s][%d]启动中...\n", daemon_config->proc_name, proc_count + 1);
         proc_start(daemon_config);
+    }
+    fprintf(stderr, "进程已全部启动...\n");
+
+    fprintf(stderr, "...\n");
+    fprintf(stderr, "日志配置\n");
+    fprintf(stderr, "日志等级[LEVEL] : %d\n", daemon_config->log_level);
+    fprintf(stderr, "日志路径[PATH]  : %s\n", daemon_config->log_path);
+    fprintf(stderr, "日志前缀[NAME]  : %s\n", daemon_config->log_name);
+
+    daemonize(DAEMON_NO_CHDIR);// | DAEMON_NO_CLOSE_FILES | DAEMON_NO_REOPEN_STD_FDS);
+
+    if(strcmp(daemon_config->log_path, "") != 0 && strcmp(daemon_config->log_name, "") != 0)
+    {
+        ret_code = kdk_log_init(0, daemon_config->log_level, daemon_config->log_path, daemon_config->log_name);
+        if(ret_code)
+            return KDK_INARG;
+        KLOG(INFO, "日志[初始化]成功...\n");
+    }
 
     while(1)
     {
         pid = waitpid(-1, KDK_NULL, WNOHANG);    
         if(pid > 0)        
         {
-            fprintf(stderr, "********PID:%d close!*******\n", pid);
+            KLOG(WARN, "进程[%s]重启中...", daemon_config->proc_name);
             proc_start(daemon_config);
         }
 
         sleep(daemon_config->sleep_time);
     }
+
+    kdk_log_destroy();
 
     daemon_config_destroy(daemon_config);
     daemon_config = KDK_NULL;

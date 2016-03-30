@@ -65,12 +65,20 @@ engine_config_create(kdk_mem_pool_t *mem_pool, kdk_uint32 mem_pool_size)
         return KDK_NULL;
     }
 
+    engine_config->log = (kdk_log_t *)kdk_mem_pool_malloc(engine_config->mem_pool, sizeof(kdk_log_t));
+    if(engine_config->log == KDK_NULL)
+    {
+        engine_config_destroy(engine_config);
+        engine_config = KDK_NULL;
+        return KDK_NULL;
+    }
+
     return engine_config;
 }
 
 
 kdk_uint32
-engine_config_init(engine_config_t *engine_config, kdk_char32 *flow_config_file, kdk_char32 *module_config_file)
+engine_config_init(engine_config_t *engine_config, kdk_char32 *flow_config_file, kdk_char32 *module_config_file, kdk_char32 *log_config_file)
 {
     kdk_uint32      ret_code;
     kdk_char32      path_file[MODULE_PATH_LEN + MODULE_FILE_NAME_LEN + 5] = {0};
@@ -84,6 +92,10 @@ engine_config_init(engine_config_t *engine_config, kdk_char32 *flow_config_file,
         return ret_code;
 
     ret_code = module_config_file_to_module_coll(module_config_file, engine_config->module_coll);
+    if(ret_code)
+        return ret_code;
+
+    ret_code = log_config_file_to_log(log_config_file, engine_config->log);
     if(ret_code)
         return ret_code;
 
@@ -125,6 +137,12 @@ engine_config_destroy(engine_config_t *engine_config)
     {
         kdk_dl_handle_coll_destroy(engine_config->dl_handle_coll);
         engine_config->dl_handle_coll = KDK_NULL;
+    }
+    
+    if(engine_config->log != KDK_NULL)
+    {
+        kdk_log_destroy(engine_config->log);
+        engine_config->log = KDK_NULL;
     }
     
     if(engine_config->mem_pool != KDK_NULL && engine_config->mem_pool_type == OWN_MEM_POOL)
@@ -284,14 +302,14 @@ engine_create(kdk_mem_pool_t *mem_pool, kdk_uint32 mem_pool_size)
 
 
 kdk_uint32
-engine_init(engine_t *engine, kdk_char32 *flow_config_file, kdk_char32 *module_config_file, kdk_char32 *flow_id)
+engine_init(engine_t *engine, kdk_char32 *flow_config_file, kdk_char32 *module_config_file, kdk_char32 *log_config_file, kdk_char32 *flow_id)
 {
     kdk_uint32      ret_code;
 
     if(engine == KDK_NULL)
         return KDK_INARG;
 
-    ret_code = engine_config_init(engine->config, flow_config_file, module_config_file);
+    ret_code = engine_config_init(engine->config, flow_config_file, module_config_file, log_config_file);
     if(ret_code)
         return ret_code;
 

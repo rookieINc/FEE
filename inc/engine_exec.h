@@ -20,6 +20,7 @@
 #include "flow_runtime.h"
 #include "module_parse.h"
 #include "module_load.h"
+#include "log_load.h"
 
 
 struct engine_config_s
@@ -29,6 +30,7 @@ struct engine_config_s
     struct flow_coll_s          *flow_coll;  
     struct module_coll_s        *module_coll;
     struct kdk_dl_handle_coll_s *dl_handle_coll;
+    struct kdk_log_s            *log;
 };
 
 typedef struct engine_config_s engine_config_t;
@@ -58,7 +60,7 @@ engine_config_t *
 engine_config_create(kdk_mem_pool_t *mem_pool, kdk_uint32 mem_pool_size);
 
 kdk_uint32
-engine_config_init(engine_config_t *engine_config, kdk_char32 *flow_config_file, kdk_char32 *module_config_file);
+engine_config_init(engine_config_t *engine_config, kdk_char32 *flow_config_file, kdk_char32 *module_config_file, kdk_char32 *log_config_file);
 
 kdk_void
 engine_config_destroy(engine_config_t *engine_config);
@@ -78,7 +80,7 @@ engine_t *
 engine_create(kdk_mem_pool_t *mem_pool, kdk_uint32 mem_pool_size);
 
 kdk_uint32
-engine_init(engine_t *engine, kdk_char32 *flow_config_file, kdk_char32 *module_config_file, kdk_char32 *flow_id);
+engine_init(engine_t *engine, kdk_char32 *flow_config_file, kdk_char32 *module_config_file, kdk_char32 *log_config_file, kdk_char32 *flow_id);
 
 kdk_void
 engine_destroy(engine_t *engine);
