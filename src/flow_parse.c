@@ -322,63 +322,6 @@ flow_coll_destroy(flow_coll_t *flow_coll)
     return ;
 }
 
-kdk_void 
-flow_print(flow_t *flow_main)
-{
-    kdk_uint32      i = 0;
-    flow_t         *flow_curr;
-    flow_node_t    *node_curr, *node_sub_curr, *node_main;
-
-    if(flow_main == KDK_NULL)
-        return ;
-
-    flow_curr = flow_main;
-    node_curr = flow_main->node_list;
-    node_main = flow_main->node_list;
-
-    fprintf(stderr, "\n");
-    fprintf(stderr,     "[FLOWID:%s]\n", flow_curr->id);
-    while(node_main != KDK_NULL)
-    {
-        fprintf(stderr, "       |\n");
-        fprintf(stderr, "     [%3s]\n", node_main->id);
-
-        node_curr = node_main;
-        flow_curr = node_curr->flow_list;
-
-        while(flow_curr != KDK_NULL)
-        {
-            if(i == 0)
-            {
-                fprintf(stderr, "       |---[ERR:%3s]", flow_curr->id);
-            }
-            else
-            {
-                fprintf(stderr, "       |       |\n");
-                fprintf(stderr, "       |   [ERR:%3s]", flow_curr->id);
-            }
-            i++;
-
-            node_sub_curr = flow_curr->node_list; 
-
-            while(node_sub_curr != KDK_NULL)
-            {
-                fprintf(stderr, "-[%3s]", node_sub_curr->id);
-                node_sub_curr = node_sub_curr->next;
-            }
-            fprintf(stderr, "\n");
-            flow_curr = flow_curr->next;
-        }
-        i = 0;
-
-        node_main = node_main->next;
-    }
-    fprintf(stderr, "       |\n");
-    fprintf(stderr, "     [end]\n");
-
-    return ;
-}
-
 kdk_uint32    
 flow_config_file_to_flow_coll(kdk_char32 *flow_config_file, flow_coll_t *flow_coll)
 {
@@ -467,4 +410,61 @@ flow_config_file_to_flow_coll(kdk_char32 *flow_config_file, flow_coll_t *flow_co
     flow_config = KDK_NULL;
 
     return KDK_SUCCESS;
+}
+
+kdk_void 
+flow_print(flow_t *flow_main)
+{
+    kdk_uint32      i = 0;
+    flow_t         *flow_curr;
+    flow_node_t    *node_curr, *node_sub_curr, *node_main;
+
+    if(flow_main == KDK_NULL)
+        return ;
+
+    flow_curr = flow_main;
+    node_curr = flow_main->node_list;
+    node_main = flow_main->node_list;
+
+    fprintf(stderr, "\n");
+    fprintf(stderr,     "[FLOWID:%s]\n", flow_curr->id);
+    while(node_main != KDK_NULL)
+    {
+        fprintf(stderr, "       |\n");
+        fprintf(stderr, "     [%3s]\n", node_main->id);
+
+        node_curr = node_main;
+        flow_curr = node_curr->flow_list;
+
+        while(flow_curr != KDK_NULL)
+        {
+            if(i == 0)
+            {
+                fprintf(stderr, "       |---[ERR:%3s]", flow_curr->id);
+            }
+            else
+            {
+                fprintf(stderr, "       |       |\n");
+                fprintf(stderr, "       |   [ERR:%3s]", flow_curr->id);
+            }
+            i++;
+
+            node_sub_curr = flow_curr->node_list; 
+
+            while(node_sub_curr != KDK_NULL)
+            {
+                fprintf(stderr, "-[%3s]", node_sub_curr->id);
+                node_sub_curr = node_sub_curr->next;
+            }
+            fprintf(stderr, "\n");
+            flow_curr = flow_curr->next;
+        }
+        i = 0;
+
+        node_main = node_main->next;
+    }
+    fprintf(stderr, "       |\n");
+    fprintf(stderr, "     [end]\n");
+
+    return ;
 }
