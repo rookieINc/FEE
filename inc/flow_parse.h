@@ -30,6 +30,12 @@
 #define FLOW_MAIN               0
 #define FLOW_ERR                1
 
+#define HEAD                    "HEAD"
+#define CONTENT                 "CONTENT"
+#define FLOW_HEAD               "flow_head"
+#define FLOW_COUNT              "flow_count"
+#define FLOW_COUNT_LEN          "flow_count_len"
+
 struct flow_node_s
 {
     kdk_char32             id[NODE_ID_LEN + 1];
@@ -78,6 +84,9 @@ flow_coll_get(flow_coll_t *flow_coll, kdk_char32 *flow_id, flow_t *flow_branch);
 
 kdk_void 
 flow_coll_destroy(flow_coll_t *flow_coll);
+
+kdk_uint32    
+flow_config_file_to_flow_coll(kdk_char32 *flow_config_file, flow_coll_t *flow_coll);
 
 kdk_void 
 flow_print(flow_t *flow);

@@ -5,8 +5,8 @@ LIB_PATH=-L$(FEE_PATH)/lib -L$(KDK_PATH)/lib
 C_FLAG=-g -Wall
 
 SO_FILE=libfee.so
-H_FILE=flow_parse.h flow_load.h flow_runtime.h module_parse.h module_load.h log_load.h engine_exec.h fee_daemon.h
-C_FILE=flow_parse.c flow_load.c flow_runtime.c module_parse.c module_load.c log_load.c engine_exec.c
+H_FILE=flow_parse.h flow_runtime.h module_parse.h module_load.h log_load.h engine_exec.h fee_daemon.h
+C_FILE=flow_parse.c flow_runtime.c module_parse.c module_load.c log_load.c engine_exec.c
 BIN_FILE=test fee_daemon
 
 .PHONY:ALL

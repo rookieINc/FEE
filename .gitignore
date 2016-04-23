@@ -33,3 +33,7 @@
 
 #core dump files
 core.*
+
+#bak files
+bak
+bak/*
