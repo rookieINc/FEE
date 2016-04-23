@@ -37,6 +37,7 @@ int main(int argc, char *argv[])
     }
     fprintf(stderr, "配置文件[初始化]成功...\n");
 
+    KLOG(INFO, "日志[初始化]成功...");
     ret_code = kdk_log_init(0, engine->config->log->level, engine->config->log->file_path, engine->config->log->file_name);
     if(ret_code)
     {
@@ -76,7 +77,7 @@ int main(int argc, char *argv[])
                 break;
             }
 
-//            fprintf(stderr, "node:%s\n", node_id);
+            KLOG(INFO, "node:%s", node_id);
 
             memset(&module, 0, sizeof(module_t));
             ret_code = module_coll_get(engine->config->module_coll, node_id, &module);
@@ -92,15 +93,13 @@ int main(int argc, char *argv[])
                 continue;
             }
 
-/*
-            fprintf(stderr, "[ID:%s]\n", module.id);
-            fprintf(stderr, "[PATH:%s]\n", module.path);
-            fprintf(stderr, "[FILE:%s]\n", module.file_name);
-            fprintf(stderr, "[FUNC:%s]\n", module.func_name);
-*/
+            KLOG(INFO, "[ID:%s]", module.id);
+            KLOG(INFO, "[PATH:%s]", module.path);
+            KLOG(INFO, "[FILE:%s]", module.file_name);
+            KLOG(INFO, "[FUNC:%s]", module.func_name);
 
             memset(path_file, 0, sizeof(path_file));
-            sprintf(path_file, "%s/%s.so", module.path, module.file_name);
+            sprintf(path_file, "%s/%s", module.path, module.file_name);
 
             memset(&dl_handle, 0, sizeof(kdk_dl_handle_t));
             ret_code = kdk_dl_handle_coll_get(engine->config->dl_handle_coll, module.func_name, &dl_handle);
@@ -110,7 +109,7 @@ int main(int argc, char *argv[])
                 break;
             }
 
-//            KLOG(INFO, "dl_handle:%s\n", dl_handle.func_name);
+            KLOG(INFO, "dl_handle:%s\n", dl_handle.func_name);
         }
 
         engine_runtime_clear(engine->runtime);

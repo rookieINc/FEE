@@ -11,7 +11,7 @@
  ***********************************************************/
 
 
-#include "daemon.h"
+#include "fee_daemon.h"
 
 daemon_config_t *
 daemon_config_create(kdk_mem_pool_t *mem_pool, kdk_uint32 mem_pool_size)

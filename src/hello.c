@@ -12,6 +12,7 @@
 
 
 #include <stdio.h>
+#include <sys/vfs.h>
 #include "kdk.h"
 
 int hello(void)
@@ -22,6 +23,7 @@ int hello(void)
 
 int main(int argc, char *argv[])
 {
+/*
     kdk_uint32  ret_code;
     int  i;
 
@@ -46,7 +48,23 @@ int main(int argc, char *argv[])
     KLOG(ERROR, "%s", "test");
 
     kdk_log_destroy();
+*/
 
+           struct stat sb;
+
+            memset(&sb, 0, sizeof(sb));
+           printf("retuslt:%d\n", stat(argv[1], &sb));
+
+           printf("Last file size:   %lld\n", sb.st_size);
+           printf("Last file size:   %lld\n", sb.st_nlink);
+           printf("Last file size:   %lld\n", sb.st_uid);
+           printf("Last file size:   %lld\n", sb.st_gid);
+           printf("Last file size:   %lld\n", sb.st_rdev);
+           printf("Last file size:   %lld\n", sb.st_blksize);
+           printf("Last file size:   %lld\n", sb.st_blocks);
+           printf("Last file size:   %lld\n", sb.st_size);
+
+           exit(EXIT_SUCCESS);
 /*
     while(1)
     {
@@ -55,5 +73,5 @@ int main(int argc, char *argv[])
     }
 */
 
-    return 0;
+//    return 0;
 }

@@ -103,7 +103,7 @@ engine_config_init(engine_config_t *engine_config, kdk_char32 *flow_config_file,
     while(module != KDK_NULLFOUND)
     {
         memset(path_file, 0, sizeof(path_file));
-        snprintf(path_file, MODULE_PATH_LEN + MODULE_FILE_NAME_LEN + 5, "%s/%s.so", module->path, module->file_name);
+        snprintf(path_file, MODULE_PATH_LEN + MODULE_FILE_NAME_LEN + 5, "%s/%s", module->path, module->file_name);
         ret_code = kdk_dl_handle_coll_set(engine_config->dl_handle_coll, path_file, module->func_name);
         if(ret_code)
             return ret_code;
