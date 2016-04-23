@@ -55,6 +55,34 @@ module_coll_create(kdk_mem_pool_t *mem_pool, kdk_uint32 mem_pool_size, kdk_uint3
     return module_coll;
 }
 
+kdk_uint32 
+module_coll_set(module_coll_t *module_coll, kdk_char32 *key, module_t *module)
+{
+    if(module_coll == KDK_NULL)
+        return KDK_INARG;
+
+    return kdk_hash_table_set_value(module_coll->coll, key, module, sizeof(module_t));
+}
+
+kdk_uint32
+module_coll_get(module_coll_t *module_coll, kdk_char32 *module_id, module_t *module)
+{
+    module_t    *ret_module;
+
+    if(module_coll == KDK_NULL || module == KDK_NULL)
+        return KDK_INARG;
+
+    ret_module = (module_t *)kdk_hash_table_get_value(module_coll->coll, module_id);
+    if(ret_module == KDK_NULL)
+        return KDK_NULLPTR;        
+    else if(ret_module == KDK_NULLFOUND)
+        return KDK_NOTFOUND;
+
+    memset(module, 0, sizeof(module_t));
+    memcpy(module, ret_module, sizeof(module_t));
+
+    return KDK_SUCCESS;
+}
 
 kdk_void 
 module_coll_destroy(module_coll_t *module_coll)
@@ -77,33 +105,114 @@ module_coll_destroy(module_coll_t *module_coll)
     return ;
 }
 
-
-kdk_uint32 
-module_coll_set(module_coll_t *module_coll, kdk_char32 *key, module_t *module)
+static kdk_uint32
+module_config_to_module(kdk_config_t *module_config, kdk_char32 *section, module_t *module)
 {
-    if(module_coll == KDK_NULL)
+    kdk_uint32  ret_code;
+
+    if(module_config == KDK_NULL || module == KDK_NULL)
         return KDK_INARG;
-
-    return kdk_hash_table_set_value(module_coll->coll, key, module, sizeof(module_t));
-}
-
-
-kdk_uint32
-module_coll_get(module_coll_t *module_coll, kdk_char32 *module_id, module_t *module)
-{
-    module_t    *ret_module;
-
-    if(module_coll == KDK_NULL || module == KDK_NULL)
-        return KDK_INARG;
-
-    ret_module = (module_t *)kdk_hash_table_get_value(module_coll->coll, module_id);
-    if(ret_module == KDK_NULL)
-        return KDK_NULLPTR;        
-    else if(ret_module == KDK_NULLFOUND)
-        return KDK_NOTFOUND;
 
     memset(module, 0, sizeof(module_t));
-    memcpy(module, ret_module, sizeof(module_t));
+
+    strncpy(module->id, section, NODE_ID_LEN);
+
+    ret_code = kdk_config_get_value(module_config, section, MODULE_PATH, module->path);
+    if(ret_code)
+        return ret_code;
+    
+    ret_code = kdk_config_get_value(module_config, section, MODULE_FILE_NAME, module->file_name);
+    if(ret_code)
+        return ret_code;
+
+    ret_code = kdk_config_get_value(module_config, section, MODULE_FUNC_NAME, module->func_name);
+    if(ret_code)
+        return ret_code;
+
+    return KDK_SUCCESS;
+}
+
+kdk_uint32    
+module_config_file_to_module_coll(kdk_char32 *module_config_file, module_coll_t *module_coll)
+{
+    kdk_config_t    *module_config;
+    module_t         module;
+    kdk_char32       section[CONFIG_KEY_LEN], value[CONFIG_VALUE_LEN];
+    kdk_uint32       ret_code = 0, module_count, module_count_len, i;
+
+    if(module_config_file == KDK_NULL || module_coll == KDK_NULL)
+        return KDK_INARG;
+
+    module_config = kdk_config_create(KDK_NULL, 1024, module_config_file);
+    if(module_config == KDK_NULL)
+        return KDK_NULLPTR;
+
+    ret_code = kdk_config_init(module_config);
+    if(ret_code)
+    {
+        kdk_config_destroy(module_config);
+        module_config = KDK_NULL;
+        return ret_code;
+    }
+
+    memset(value, 0, sizeof(value));
+    ret_code = kdk_config_get_value(module_config, HEAD, MODULE_TYPE, value);
+    if(ret_code)
+    {
+        kdk_config_destroy(module_config);
+        module_config = KDK_NULL;
+        return ret_code;
+    }
+    module_coll->type = atoi(value);
+
+    memset(value, 0, sizeof(value));
+    ret_code = kdk_config_get_value(module_config, HEAD, MODULE_COUNT, value);
+    if(ret_code)
+    {
+        kdk_config_destroy(module_config);
+        module_config = KDK_NULL;
+        return ret_code;
+    }
+    module_count = atoi(value);
+
+    memset(value, 0, sizeof(value));
+    ret_code = kdk_config_get_value(module_config, HEAD, MODULE_COUNT_LEN, value);
+    if(ret_code)
+    {
+        kdk_config_destroy(module_config);
+        module_config = KDK_NULL;
+        return ret_code;
+    }
+    module_count_len = atoi(value);
+
+    for(i = 1; i <= module_count; i++)
+    {
+        memset(section, 0, sizeof(section));
+        snprintf(section, CONFIG_KEY_LEN, "%0*d", module_count_len, i);  
+
+        ret_code = module_config_to_module(module_config, section, &module);
+        if(ret_code && ret_code != KDK_NOTFOUND)
+        {
+            kdk_config_destroy(module_config);
+            module_config = KDK_NULL;
+            return ret_code;
+        }
+        else if(ret_code == KDK_NOTFOUND)
+        {
+            continue;
+        }
+
+        ret_code = module_coll_set(module_coll, section, &module);
+        if(ret_code)
+        {
+            kdk_config_destroy(module_config);
+            module_config = KDK_NULL;
+            return ret_code;
+        }
+    }
+
+    kdk_config_destroy(module_config);
+    module_config = KDK_NULL;
 
     return KDK_SUCCESS;
 }
