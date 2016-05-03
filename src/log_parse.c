@@ -2,16 +2,16 @@
 /************************************************************
  * Copyright(C), 2015-2016, QTPAY
  * 
- * FileName    : log_load.c
+ * FileName    : log_parse.c
  * Author      : rookieINc
  * Version     : v0.1.0
  * Date        : 2016-03-30 20:35
- * Description : log_load.c
+ * Description : log_parse.c
  * History     : 
  ***********************************************************/
 
 
-#include "log_load.h"
+#include "log_parse.h"
 
 kdk_uint32
 log_config_file_to_log(kdk_char32 *log_config_file, kdk_log_t *log)

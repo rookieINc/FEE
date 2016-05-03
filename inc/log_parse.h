@@ -2,17 +2,17 @@
 /************************************************************
  * Copyright(C), 2015-2016, QTPAY
  * 
- * FileName    : log_load.h
+ * FileName    : log_parse.h
  * Author      : rookieINc
  * Version     : v0.1.0
  * Date        : 2016-03-30 20:38
- * Description : log_load.h
+ * Description : log_parse.h
  * History     : 
  ***********************************************************/
 
 
-#ifndef _LOG_LOAD_H_INCLUDED_
-#define _LOG_LOAD_H_INCLUDED_
+#ifndef _LOG_PARSE_H_INCLUDED_
+#define _LOG_PARSE_H_INCLUDED_
 
 #include "kdk.h"
 
@@ -24,4 +24,4 @@
 kdk_uint32
 log_config_file_to_log(kdk_char32 *log_config_file, kdk_log_t *log);
 
-#endif /* _LOG_LOAD_H_INCLUDED_ */
+#endif /* _LOG_PARSE_H_INCLUDED_ */

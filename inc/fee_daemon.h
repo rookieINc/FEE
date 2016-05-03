@@ -2,17 +2,17 @@
 /************************************************************
  * Copyright(C), 2015-2016, QTPAY
  * 
- * FileName    : daemon.h
+ * FileName    : fee_daemon.h
  * Author      : rookieINc
  * Version     : v0.1.0
  * Date        : 2016-01-18 18:17
- * Description : daemon.h
+ * Description : fee_daemon.h
  * History     : 
  ***********************************************************/
 
 
-#ifndef _DAEMON_H_INCLUDED_
-#define _DAEMON_H_INCLUDED_
+#ifndef _FEE_DAEMON_H_INCLUDED_
+#define _FEE_DAEMON_H_INCLUDED_
 
 #include "kdk.h"
 
@@ -50,4 +50,4 @@ struct daemon_config_s
 typedef struct daemon_config_s daemon_config_t;
 
 
-#endif /* _DAEMON_H_INCLUDED_ */
+#endif /* _FEE_DAEMON_H_INCLUDED_ */
