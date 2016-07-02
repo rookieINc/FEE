@@ -48,7 +48,7 @@ daemon_config_create(kdk_mem_pool_t *mem_pool, kdk_uint32 mem_pool_size)
 kdk_uint32  
 daemon_config_init(daemon_config_t *daemon_config, kdk_char32 *daemon_config_file)
 {
-    kdk_uint32      ret_code, argc, i;
+    kdk_uint32      ret_code, i;
     kdk_char32      value[PATH_LEN + 1];
     kdk_char32      key[PATH_LEN + 1];
     kdk_config_t   *config;
@@ -94,15 +94,15 @@ daemon_config_init(daemon_config_t *daemon_config, kdk_char32 *daemon_config_fil
     kdk_config_get_value(config, LOG, LOG_LEVEL, value);
 
     if(strcmp(value, "DEBUG") == 0)
-        daemon_config->log_level = LOG_LEVEL_DEBUG;
+        daemon_config->log_level = KDK_LOG_LEVEL_DEBUG;
     else if(strcmp(value, "INFO") == 0)
-        daemon_config->log_level = LOG_LEVEL_INFO;
+        daemon_config->log_level = KDK_LOG_LEVEL_INFO;
     else if(strcmp(value, "WARN") == 0)
-        daemon_config->log_level = LOG_LEVEL_WARN;
+        daemon_config->log_level = KDK_LOG_LEVEL_WARN;
     else if(strcmp(value, "ERROR") == 0)
-        daemon_config->log_level = LOG_LEVEL_ERROR;
+        daemon_config->log_level = KDK_LOG_LEVEL_ERROR;
     else
-        daemon_config->log_level = LOG_LEVEL_DEBUG;
+        daemon_config->log_level = KDK_LOG_LEVEL_DEBUG;
 
     // PART [PROCESS]
     memset(value, 0, sizeof(value));
@@ -226,8 +226,8 @@ proc_start(daemon_config_t *daemon_config)
     return ;
 }
 
-kdk_uint32
-main(kdk_uint32 argc, kdk_char32 *argv[])
+kdk_int32
+main(kdk_int32 argc, kdk_char32 *argv[])
 {
     kdk_pid             pid;
     kdk_uint32          proc_count, ret_code;

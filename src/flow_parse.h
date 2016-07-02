@@ -64,15 +64,6 @@ struct flow_coll_s
 
 typedef struct flow_coll_s flow_coll_t;
 
-static kdk_uint32 
-get_process_status_from_flow_stream(kdk_char32 *flow_stream, kdk_char32 *flow_id, kdk_uint32 flow_id_len, kdk_uint32 *process_status, kdk_uint32 *offset);
-
-static flow_node_t *
-flow_node_create(flow_coll_t *flow_coll, kdk_char32 *flow_node_id);
-
-static flow_t *
-flow_create(flow_coll_t *flow_coll, kdk_char32 *flow_id);
-
 flow_coll_t *
 flow_coll_create(kdk_mem_pool_t *mem_pool, kdk_uint32 mem_pool_size, kdk_uint32 prime);
 

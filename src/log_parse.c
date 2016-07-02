@@ -17,7 +17,7 @@ kdk_uint32
 log_config_file_to_log(kdk_char32 *log_config_file, kdk_log_t *log)
 {
     kdk_config_t    *log_config; 
-    kdk_char32       key[CONFIG_KEY_LEN], value[CONFIG_VALUE_LEN], flow_head[CONFIG_KEY_LEN] = {0};
+    kdk_char32       value[CONFIG_VALUE_LEN] = {0};
     kdk_uint32       ret_code = 0;
 
     if(log_config_file == KDK_NULL || log == KDK_NULL)
@@ -65,15 +65,15 @@ log_config_file_to_log(kdk_char32 *log_config_file, kdk_log_t *log)
     }
 
     if(strcmp(value, "DEBUG") == 0)
-        log->level = LOG_LEVEL_DEBUG;
+        log->level = KDK_LOG_LEVEL_DEBUG;
     else if(strcmp(value, "INFO") == 0)
-        log->level = LOG_LEVEL_INFO;
+        log->level = KDK_LOG_LEVEL_INFO;
     else if(strcmp(value, "WARN") == 0)
-        log->level = LOG_LEVEL_WARN;
+        log->level = KDK_LOG_LEVEL_WARN;
     else if(strcmp(value, "ERROR") == 0)
-        log->level = LOG_LEVEL_ERROR;
+        log->level = KDK_LOG_LEVEL_ERROR;
     else
-        log->level = LOG_LEVEL_DEBUG;
+        log->level = KDK_LOG_LEVEL_DEBUG;
 
     kdk_config_destroy(log_config);
     log_config = KDK_NULL;

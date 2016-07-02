@@ -61,9 +61,6 @@ module_coll_get(module_coll_t *module_coll, kdk_char32 *module_id, module_t *mod
 kdk_void 
 module_coll_destroy(module_coll_t *module_coll);
 
-static kdk_uint32
-module_config_to_module(kdk_config_t *module_config, kdk_char32 *section, module_t *module);
-
 kdk_uint32    
 module_config_file_to_module_coll(kdk_char32 *module_config_file, module_coll_t *module_coll);
 

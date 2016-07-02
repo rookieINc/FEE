@@ -179,8 +179,7 @@ flow_coll_set(flow_coll_t *flow_coll, kdk_char32 *flow_id, kdk_char32 *flow_stre
                         offset      = 0, 
                         stepset     = 0, 
                         status      = PROCESS_NOR_STATUS,
-                        pre_status  = status,
-                        i           = 0;
+                        pre_status  = status;
     kdk_char32          temp_id[FLOW_ID_LEN + 1] = {0};
     flow_t             *flow_main, *flow_new, *flow_curr;
     flow_node_t        *node_main, *node_new, *node_curr;

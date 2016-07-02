@@ -71,6 +71,9 @@ kdk_uint32
 engine_runtime_init(engine_runtime_t *engine_runtime, engine_config_t *engine_config, kdk_char32 *flow_id);
 
 kdk_void
+engine_runtime_clear(engine_runtime_t *engine_runtime);
+
+kdk_void
 engine_runtime_destroy(engine_runtime_t *engine_runtime);
 
 

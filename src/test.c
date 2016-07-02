@@ -4,7 +4,7 @@ int main(int argc, char *argv[])
 {
     engine_t   *engine;
     kdk_char32  node_id[7] = {0};
-    kdk_uint32  ret_code, i, is_succ;
+    kdk_uint32  ret_code, is_succ;
     module_t    module;
     kdk_dl_handle_t dl_handle;   
     kdk_char32  path_file[124];
@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     engine = engine_create(KDK_NULL, 14096);
     if(engine == KDK_NULL)
     {
-        fprintf(stderr, "引擎[创建]失败[%d]...\n", ret_code);
+        fprintf(stderr, "引擎[创建]失败...\n");
         return KDK_NULLPTR;
     }
     fprintf(stderr, "...\n");
